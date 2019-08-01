@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>ETH转出</title>
+    <link rel="stylesheet" type="text/css" href="../../css/base.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/custom.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/touchslider.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/coin.css"/>
+    <script src="../../script/const.js"></script>
+</head>
+<body>
+<div id="app" class="transfer_out_page">
+
+    <!--头部标题-->
+    <div class="com_head">
+        <div class="back_but" onclick="$A.change_frame($api.getStorage('from_page'))"></div>
+        <div class="title"  v-text="coin_name+'转出'"></div>
+        <div class="right_box" onclick="$A.change_frame('user_center_transfer_out_record')">
+            轉出記錄
+        </div>
+    </div>
+
+    <div class="use_able_info">
+        <div class="left">可用資產</div>
+        <div class="right">
+            <span v-text="ToDouble(balance)"></span>
+            <span v-text="coin_name"></span>
+        </div>
+    </div>
+
+    <div v-if="status===0" style="background: #fdebe8; border: 1px solid indianred; width: 80%; margin: 20px auto; padding: 20px; font-size: 1.25rem;">
+        當前幣種,暫時禁止轉出
+    </div>
+
+    <div class="form_box"  v-if="status===1">
+        <div class="row">
+            <div class="name">
+                錢包地址:
+            </div>
+            <div class="content">
+                <input type="text" v-model="form_address" class="input">
+            </div>
+            <div class="tip_info">
+                <div class="qr_but" @click="open_qr()"></div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="name">
+                轉出數量:
+            </div>
+            <div class="content">
+                <input type="number" v-model="form_nums" class="input">
+            </div>
+            <div class="tip_info">
+                <span @click="form_nums=balance">全部轉出</span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="name">
+                交易密碼: 
+            </div>
+            <div class="content">
+                <input type="password" v-model="form_password" class="input">
+            </div>
+            <div class="tip_info">
+            </div>
+        </div>
+
+        <div class="row button_box">
+            <button class="but_2" type="button" @click="submit()">確認轉出</button>
+        </div>
+    </div>
+
+
+    <div class="transfer_info">
+        <div class="outer">
+            <div class="title">轉出說明</div>
+            <div class="con">
+              <p>系統會為每次轉幣支付網絡費，但由於網絡的不確定性，部分轉幣可能會有延遲，請您諒解</p>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+</body>
+</html>
+
+<script type="text/javascript" src="../../script/lib/api.js"></script>
+<script type="text/javascript" src="../../script/lib/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="../../script/lib/base.js"></script>
+<script type="text/javascript" src="../../script/lib/vue.js"></script>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            curr_coin: {
+                name: 'otc',
+                img: '../../images/coin_icon.png',
+            },
+            title: "",
+            coin_name: "",
+            status: 0,
+            balance: 0,
+            wallet_address: "",
+
+            form_address:'',
+            form_nums:'',
+            form_password:'',
+
+        },
+        mounted: function () {
+            var $this=this
+            setTimeout(function () {
+                $this.get_data()
+
+                // 监听属性
+                api.addEventListener({
+                    name: 'user_center_transfer_out_reflush'
+                }, function(ret, err) {
+                    $this.get_data()
+                });
+            },600)
+        },
+        methods: {
+
+            get_data: function () {
+                var $this = this
+                $this.curr_coin = $api.getStorage('choose_currency_coin')
+                //$A.alert('当期币种信息: '+JSON.stringify($this.curr_coin))
+                $A.request('finance/in_info', {
+                    coin: $this.curr_coin.name
+                }, function (data) {
+                    data.status = Number(data.status)
+                    $this.form_address = data.form_address
+                    $this.form_nums = data.form_nums
+                    $this.form_password = data.form_password
+                    $this.title = data.title
+                    $this.coin_name = data.coin_name
+                    $this.status = data.status
+                    $this.balance = data.balance
+                    $this.wallet_address = data.wallet_address
+                    $this.$forceUpdate()
+                })
+            },
+
+            // 点击提交
+            submit:function(){
+                if (this.form_address.length<5){
+                    $A.toast('【錢包地址】-錯誤')
+                    return
+                }
+                this.form_nums=Number(this.form_nums)
+                if (!(this.form_nums>0)){
+                    $A.toast('【轉出數量】-錯誤')
+                    return
+                }
+                if (this.form_password.length<6){
+                    $A.toast('【交易密碼】-錯誤')
+                    return
+                }
+                var params={
+                    addr:this.form_address,
+                    coin:this.curr_coin.name.toLowerCase(),
+                    num:this.form_nums,
+                    pay_pwd:this.form_password
+                }
+                $A.alert(JSON.stringify(params))
+                $A.request('finance/coin_out',params,function (data) {
+                    $A.alert('操作成功!')
+                    $A.change_frame('user_center_index')
+                })
+            },
+
+            // 扫描二维码
+            open_qr:function () {
+                var $this=this
+                $A.qr(function (content) {
+                    $this.form_address=content
+                    $this.$forceUpdate()
+                })
+            }
+
+        }
+    })
+
+    $(function () {
+        $('.transfer_out_page').css('minHeight',$A.get_body_height()+'px')
+    })
+</script>

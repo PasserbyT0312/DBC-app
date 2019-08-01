@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>身份信息认证-提交</title>
+    <link rel="stylesheet" type="text/css" href="../../css/base.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/custom.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/touchslider.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/coin.css"/>
+    <script src="../../script/const.js"></script>
+</head>
+<body>
+<div id="app" class="auth_submit_page">
+
+    <!--头部标题-->
+    <div class="com_head blue">
+        <div class="back_but" onclick="$A.change_frame('user_setup_index')"></div>
+        <div class="title">身份信息認證-提交</div>
+    </div>
+
+    <form action="">
+        <div class="item">
+            <div class="name">證件類型:</div>
+            <div class="content">
+                <span class="card_type">身份證</span>
+            </div>
+        </div>
+        <div class="item">
+            <div class="name">證件號碼:</div>
+            <div class="content">
+                <input v-model="idcard" type="number">
+            </div>
+        </div>
+        <div class="item">
+            <div class="name">證件姓名:</div>
+            <div class="content">
+                <input v-model="true_name" type="text">
+            </div>
+        </div>
+    </form>
+
+
+    <div class="img_upload_item">
+          <div class="name">手持證件照:</div>
+        <div class="img_row">
+            <img :src="idcardimg1?idcardimg1_local:'../../images/upload_img.png'">
+            <button class="but_1_1" @click="choose_by_album(1)">上傳圖片</button>
+            <!--<input type="text" v-model="idcardimg1">-->
+        </div>
+    </div>
+    <div class="img_upload_item">
+        <div class="name">證件-正面:</div>
+        <div class="img_row">
+            <img :src="idcardimg2_local?idcardimg2_local:'../../images/upload_img.png'">
+              <button class="but_1_1" @click="choose_by_album(2)">上傳圖片</button>
+            <!--<input type="text" v-model="idcardimg2">-->
+        </div>
+    </div>
+    <div class="img_upload_item">
+        <div class="name">證件-反面:</div>
+        <div class="img_row">
+            <img :src="idcardimg3_local?idcardimg3_local:'../../images/upload_img.png'">
+            <button class="but_1_1" @click="choose_by_album(3)">上傳圖片</button>
+            <!--<input type="text" v-model="idcardimg3">-->
+        </div>
+    </div>
+
+
+    <div class="submit_outer" style="padding-bottom: 0.4rem">
+        <button class="but_1" type="button" @click="submit()">確認提交</button>
+    </div>
+
+</div>
+
+</body>
+</html>
+
+<script type="text/javascript" src="../../script/lib/api.js"></script>
+<script type="text/javascript" src="../../script/lib/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="../../script/lib/base.js"></script>
+<script type="text/javascript" src="../../script/lib/vue.js"></script>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            idcard: "",
+            true_name: "",
+            idcardimg1: "",
+            idcardimg1_local: "",
+            idcardimg2: "",
+            idcardimg2_local: "",
+            idcardimg3: "",
+            idcardimg3_local: "",
+            idcardimg_title: ['手持證件照', '證件-正面', '證件-反面'],
+        },
+        mounted: function () {
+            this.idcard = ""
+            this.true_name = ""
+            this.idcardimg1 = ""
+            this.idcardimg2 = ""
+            this.idcardimg3 = ""
+
+            if ($A.dev_model === 0) {
+                this.idcard = "612331656664111133"
+                this.true_name = "張三"
+                this.idcardimg1 = ""
+                this.idcardimg2 = ""
+                this.idcardimg3 = ""
+            }
+
+            var $this = this
+            setTimeout(function () {
+                // 监听属性
+                api.addEventListener({
+                    name: 'user_setup_auth_submit_reflush'
+                }, function (ret, err) {
+                    $this.idcard = ""
+                    $this.true_name = ""
+                    $this.idcardimg1 = ""
+                    $this.idcardimg2 = ""
+                    $this.idcardimg3 = ""
+                });
+            }, 600)
+        },
+        methods: {
+            // 上传信息
+            submit: function (type) {
+                if (!(this.idcard.length === 18 || this.idcard.length === 15)) {
+                    $A.toast('【證件-號碼】錯誤')
+                    return
+                }
+                if (this.true_name.length < 2) {
+                    $A.toast('【證件-真實姓名】錯誤')
+                    return
+                }
+                if (this.idcardimg1.length === 0) {
+                    $A.toast('【手持證件照】-未選擇')
+                    return
+                }
+                if (this.idcardimg2.length === 0) {
+                    $A.toast('【證件-正面】-未選擇')
+                    return
+                }
+                if (this.idcardimg3.length === 0) {
+                    $A.toast('【證件-反面】-未選擇')
+                    return
+                }
+                var params = {
+                    idcard: this.idcard,
+                    truename: this.true_name,
+                    idcardimg1: this.idcardimg1,
+                    idcardimg2: this.idcardimg2,
+                    idcardimg3: this.idcardimg3,
+                }
+                $A.request('user/card_save', params, function (data) {
+                    api.sendEvent({
+                        name: 'auth_info_submit',
+                        extra: {
+                            status: 3
+                        }
+                    });
+                    $api.setStorage('idcardauth', 3)
+                    $A.alert('信息已經上傳,請等待系統處理通過')
+                    $A.change_frame('user_center_index')
+                })
+
+                //this.choose_by_album(type)
+            },
+            choose_by_album: function (type) {
+                var UIAlbumBrowser = api.require('UIAlbumBrowser');
+                var $this = this
+                UIAlbumBrowser.open({
+                    max: 1,
+                    styles: {
+                        bg: '#fff',
+                        mark: {
+                            icon: '',
+                            position: 'bottom_left',
+                            size: 20
+                        },
+                        nav: {
+                            bg: 'rgba(0,0,0,0.6)',
+                            titleColor: '#fff',
+                            titleSize: 18,
+                            cancelColor: '#fff',
+                            cancelSize: 16,
+                            finishColor: '#fff',
+                            finishSize: 16
+                        }
+                    },
+                    rotation: true
+                }, function (ret) {
+                    if (ret && ret.list && ret.list.length) {
+                        //$A.alert(JSON.stringify(ret))
+                        var image = ret.list[0]
+                        if ($A.isAndroid()) {
+                            $this.upload_icon(image.path, type)
+                        } else {
+                            // iOS需要路径转化
+                            UIAlbumBrowser.transPath({
+                                path: image.path
+                            }, function (ret, err) {
+                                if (ret) {
+                                    //$A.alert(JSON.stringify());
+                                    $this.upload_icon(ret.path, type)
+                                } else {
+                                    //alert(JSON.stringify(err));
+                                }
+                            });
+                        }
+
+
+                        //$A.alert('相册选择:' + JSON.stringify(image.path));
+                    }
+                });
+            },
+
+            upload_icon: function (imagePath, type) {
+                var fileParams = {}
+                var $this = this
+                fileParams['idcardimg' + type] = imagePath
+                var fun = function (data) {
+                    $this['idcardimg' + type] = data
+                    $this['idcardimg' + type + '_local'] = imagePath
+                    $this.$forceUpdate()
+                    //$A.toast('上传成功')
+                    //$A.alert('上传完毕:' + $A.domname + $this['idcardimg' + type]);
+                }
+                $A.request('user/card_upload', {
+                    token: api.getPrefs({
+                        sync: true,
+                        key: 'token'
+                    })
+                }, fun, null, fileParams)
+            }
+
+
+        }
+    })
+
+    $(function () {
+        $('.auth_submit_page').css('minHeight', $A.get_body_height() + 'px')
+    })
+</script>

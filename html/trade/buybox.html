@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <title>属性弹框</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/base.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/touchslider.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/coin.css" />
+    <script src="../../script/const.js"></script>
+    <style>
+        html,
+        body {
+            background-color: transparent !important;
+            overflow: hidden;
+            position: relative;
+            height: 100%;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .wrap {
+            position: absolute;
+            bottom: 0;
+            top: 0;
+            left: 0;
+            right: 0;
+        }
+
+        .parent {
+            width: 100%;
+            position: fixed;
+            height: auto;
+            bottom: 0;
+            text-align: left;
+            background: #fff;
+            left: 0;
+        }
+
+        .boxTop {
+            background: #F7F7FB;
+            padding: .8rem;
+            color: #263E56;
+        }
+
+        .boxContent {
+            padding: .8rem;
+            font-size: 14px;
+        }
+
+        .title {
+            font-size: 20px;
+        }
+
+        .blue {
+            color: #3D80CE;
+        }
+
+        .buyOptions {
+            color: #98A5B1;
+            border-bottom: 2px solid #F7F7FB;
+            margin-right: 10px;
+            padding: 5px 0;
+        }
+
+        .buyOptions.active {
+            color: #3D80CE;
+            border-color: #3D80CE;
+        }
+
+        .input-row {
+            border: 1px solid #DCE1E5;
+            padding: 3px 10px;
+            margin-bottom: 5px;
+        }
+
+        .buyAll {
+            padding: 2px 0 2px 10px;
+            border-left: 1px solid #EAEDF0;
+            margin-left: 10px;
+        }
+
+        .input-row input {
+            padding-right: 5px;
+        }
+
+        .bigSize {
+            font-size: 20px;
+            color: #3D80CE;
+        }
+
+        .gray {
+            color: #98A5B1;
+        }
+
+        .clickOrder {
+            background: #3D80CE;
+            width: 100%;
+            color: #fff;
+            height: 2.2rem;
+            font-size: 14px;
+        }
+
+        .clickOrder:disabled {
+            background: #C7CED4;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app" class="wrap">
+        <div id="farce" class="parent">
+            <div class="boxTop flex-box-between">
+                <div>
+                    <div class="title b">购买BTC</div>
+                    <div>单价 <span class="blue">¥69226.00</span></div>
+                </div>
+            </div>
+            <div class="boxContent">
+                <div class="flex-box margin-b-rem">
+                    <div class="buyOptions b" :class="{'active':buyType==0}" @click="changeType(0)">按价格购买</div>
+                    <div class="buyOptions b" :class="{'active':buyType==1}" @click="changeType(1)">按数量购买</div>
+                </div>
+                <div class="input-row flex-box-center">
+                    <input type="number" v-model="num" :placeholder="buyType==0?'请输入购买金额':'请输入购买数量'" class="flex-con">
+                    <span>{{buyType==0?'CNY':'BTC'}}</span>
+                    <div class="blue buyAll">全部买入</div>
+                </div>
+                <p class="prompt gray">限额 ¥370.00 - ¥370.00</p>
+                <p class="tx-r gray">交易数量 0.000000 BTC</p>
+                <div class="flex-box-between margin-b-10">
+                    <p>实付款</p>
+                    <div class="bigSize tx-r">¥0.00</div>
+                </div>
+                <button class="aui-btn clickOrder margin-b-10" type="button" :disabled="num==''" @click="goDetail">下单</button>
+            </div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="../../script/lib/api.js"></script>
+<script type="text/javascript" src="../../script/lib/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="../../script/lib/base.js"></script>
+<script type="text/javascript" src="../../script/lib/vue.js"></script>
+<script type="text/javascript">
+    clickOutside('farce', 'frame');
+    var app = new Vue({
+            el: "#app",
+            data: {
+                buyType: 0,
+                num: 10
+            },
+            methods: {
+                changeType: function(type) {
+                    this.buyType = type;
+                },
+                goDetail: function() {
+                      api.closeFrame({});
+                    api.openFrame({
+                        name: 'orderdetail',
+                        url: '../trade/orderdetail.html'
+                    });
+                }
+            }
+        })
+        //点击框外删除
+    function clickOutside(node, type) {
+        var div = document.getElementById(node);
+        $(document).click(function(event) {
+
+            var div = document.getElementById(node);
+            var x = event.clientX;
+            var y = event.clientY;
+            var divx1 = div.offsetLeft;
+            var divy1 = div.offsetTop;
+            var divx2 = div.offsetLeft + div.offsetWidth;
+            var divy2 = div.offsetTop + div.offsetHeight;
+            if (x < divx1 || x > divx2 || y < divy1 || y > divy2) {
+                api.closeFrame({});
+            } else {
+                // alert('离开')
+            }
+        })
+    }
+
+    //选择按钮
+    function currentClick(that) {
+
+    }
+    //产品属性
+    function getAttribute() {
+
+        api.parseTapmode();
+    }
+
+    function closeFrame() {
+        // console.log(123)
+        api.closeFrame({});
+    }
+</script>
+
+</html>

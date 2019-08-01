@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>公告列表</title>
+    <link rel="stylesheet" type="text/css" href="../../css/base.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/custom.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/touchslider.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/coin.css"/>
+    <script src="../../script/const.js"></script>
+</head>
+<body>
+<div id="app" class="notice_list_page">
+
+    <!--头部标题-->
+    <div class="com_head">
+        <!-- <div class="back_but" onclick="$A.change_frame('user_center_index')"></div> -->
+        <div class="back_but" onclick="$A.change_frame('index')"></div>
+        <div class="title">公告列表</div>
+    </div>
+
+
+    <div id="data_list" class="list" style="overflow-y: auto;overflow-x: hidden;">
+
+        <div id="list_content" v-show="list.length>0">
+            <div class="item" v-for="val in list" @click="detail(val.id)">
+                <div class="outer">
+                    <div class="left">
+                        <div class="title">
+                            <span class="ovd_s" v-text="val.title"></span>
+                        </div>
+                        <div class="time" v-text="$A.timestampToTime(val.addtime)"></div>
+                    </div>
+                    <div class="right">
+                    </div>
+                </div>
+            </div>
+            <div class="c"></div>
+        </div>
+
+        <div v-show="list.length==0" class="no_data">
+            <img src="../../images/no_data.png" alt="">
+              <p>暫無數據...</p>
+        </div>
+    </div>
+
+
+</div>
+
+</body>
+</html>
+
+<script type="text/javascript" src="../../script/lib/api.js"></script>
+<script type="text/javascript" src="../../script/lib/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="../../script/lib/base.js"></script>
+<script type="text/javascript" src="../../script/lib/vue.js"></script>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            list: [
+            ],
+            page: 1,
+            no_more: false       //是否有更多可以加载
+        },
+        mounted: function () {
+            var $this = this
+            setTimeout(function () {
+
+                $this.get_list()
+                // 设置列表高度
+                set_scroll_div()
+            }, 600)
+
+        },
+        methods: {
+            get_list: function () {
+                var $this = this
+                if (this.no_more === true) {
+                    //$A.toast('没有数据了')
+                    return
+                }
+                $A.request('news/get_list', {}, function (data) {
+                    if (data.length===0){
+                        $this.no_more=true
+                    }
+                    //$A.alert('数据条数是:'+data.length)
+                    $.each(data, function (i, obj) {
+                        $this.list.push(obj)
+                    })
+                    $this.page += 1
+                    $this.$forceUpdate()
+                    $('#list_content').height($this.list.length * 70)
+                })
+            },
+
+            detail: function (id) {
+                $api.setStorage('notice_detail_id', id)
+                $A.change_frame('user_center_notice_detail')
+            }
+        }
+    })
+
+    function set_scroll_div() {
+        var ID = 'data_list'
+        // 设置列表高度
+        var curr_height = $('.tab_bar').height() + $('.com_head').height() + Number($api.getStorage('StatusBarHeight')) - 20
+        $('#' + ID).height(api.winHeight - curr_height)
+        document.getElementById(ID).onscroll = function () {
+            var scrollHeight = document.getElementById(ID).scrollHeight;
+            var scrollTop = document.getElementById(ID).scrollTop;
+            var clientHeight = document.getElementById(ID).clientHeight;
+            if (scrollHeight - clientHeight === scrollTop) {
+                //滚动条滚到最底部
+                //app.get_list()
+            }
+        };
+    }
+</script>

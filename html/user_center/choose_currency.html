@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>币种选择</title>
+    <link rel="stylesheet" type="text/css" href="../../css/base.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/custom.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/touchslider.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/coin.css"/>
+    <script src="../../script/const.js"></script>
+</head>
+<body>
+<div id="app" class="choose_currency_page">
+
+    <!--头部标题-->
+    <div class="com_head">
+        <div class="back_but" onclick="$A.change_frame('user_center_index')"></div>
+        <div class="title">幣種選擇</div>
+    </div>
+
+    <div class="input_outer">
+        <div class="search_icon"></div>
+        <input type="text" :model="search_key" placeholder="請輸入簡稱/首字母">
+    </div>
+
+    <div class="line">請選擇:</div>
+
+    <div class="coin_list">
+        <div class="item" v-for="val in arr" v-if="search_key.length==0 || val.name.indexOf(search_key)>-1">
+            <div class="con" :class="{curr:choose_data.name===val.name}" @click="choose_data=val;sure()">
+                <img :src="val.img" onerror="this.src=image_load_error">
+                <span v-text="val.name"></span>
+            </div>
+        </div>
+        <div class="c"></div>
+    </div>
+
+</div>
+
+</body>
+</html>
+
+<script type="text/javascript" src="../../script/lib/api.js"></script>
+<script type="text/javascript" src="../../script/lib/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="../../script/lib/base.js"></script>
+<script type="text/javascript" src="../../script/lib/vue.js"></script>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            choose_data: {
+                name: '',
+                img: '',
+            },
+            search_key: '',
+            arr: [/*
+                {
+                    name: 'otc',
+                    img: '../../images/coin_icon.png',
+                },
+                {
+                    name: 'eth',
+                    img: '../../images/coin_icon.png',
+                }
+            */]
+        },
+        mounted: function () {
+            var $this=this
+            setTimeout(function () {
+                $this.get_data()
+
+                api.addEventListener({
+                    name: 'choose_currency_reflush'
+                }, function (ret, err) {
+                    $this.choose_data={
+                        name: '',
+                        img: '',
+                    }
+                    $this.get_data()
+                });
+            },600)
+        },
+        methods: {
+            // 请求拉取数据
+            get_data: function () {
+                var $this = this
+                var set_data = function (data) {
+                    $this.arr = data
+                    $this.$forceUpdate()
+                }
+                $A.request('finance/coin_list', {}, set_data, set_data)
+            },
+            sure: function () {
+                var $this=this
+                var type = $api.getStorage('choose_currency_type')
+                $api.setStorage('choose_currency_coin',$this.choose_data)
+
+                switch (type) {
+                    // 转出-表单
+                    case 'transfer_out':
+                        api.sendEvent({
+                            name: 'user_center_transfer_out_reflush',
+                        });
+                        $A.change_frame('user_center_transfer_out')
+                        break
+                    // 转出-记录
+                    case 'transfer_out_record':
+                        api.sendEvent({
+                            name: 'transfer_out_record_reflush',
+                        });
+                        $A.change_frame('user_center_transfer_out_record')
+                        break;
+                    // 转入-表单
+                    case 'transfer_in':
+                        api.sendEvent({
+                            name: 'user_center_transfer_in_reflush',
+                        });
+                        $A.change_frame('user_center_transfer_in')
+                        break;
+                    // 转入-记录
+                    case 'transfer_in_record':
+                        api.sendEvent({
+                            name: 'user_center_transfer_in_record_reflush',
+                        });
+                        $A.change_frame('user_center_transfer_in_record')
+                        break;
+                    // 货币账单列表
+                    case 'coin_order_list':
+                        api.sendEvent({
+                            name: 'user_center_coin_order_list_reflush',
+                        });
+                        $A.change_frame('user_center_coin_order_list')
+                        break;
+                }
+
+            }
+
+        }
+    })
+
+    $(function () {
+        $('.choose_currency_page').css('minHeight', $A.get_body_height() + 'px')
+    })
+</script>

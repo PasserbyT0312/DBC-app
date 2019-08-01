@@ -1,0 +1,115 @@
+
+/* demo slider*/
+.touchslider-demo .touchslider-viewport {
+    /* border: 5px solid #fff1e0;
+     background: #fff1e0;*/
+    /*-webkit-border-radius: 6px;
+    border-radius: 6px;*/
+    overflow: hidden;
+    position: relative;
+    height: 200px;
+    width : 400px;
+}
+
+.touchslider-demo .touchslider-item {
+    height: 345px;
+    overflow: hidden;
+}
+.touchslider-demo .touchslider-item img{ max-width:500px;}
+
+.touchslider-demo .touchslider-nav {
+    text-align: center;
+    margin-top: 16px;
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+    line-height: 25px;
+    height: 25px;
+}
+
+.touchslider-demo .touchslider-nav a {
+    cursor: pointer;
+    color: #000;
+}
+
+.touchslider-demo .touchslider-nav a:active {
+    background: #689db2;
+}
+
+.touchslider-nav {
+    font: bold 16px/16px Georgia;
+}
+
+.touchslider-demo .touchslider-prev {
+    position: relative;
+    margin-right: 16px;
+    height: 16px;
+    background: #fff;
+    width: 100px;
+    display: inline-block;
+    padding: 0 0 0 10px;
+    -webkit-border-radius: 12px 0 0 12px;
+    border-radius: 12px 0 0 12px;
+}
+
+.touchslider-demo .touchslider-next {
+    position: relative;
+    margin-left: 16px;
+    width: 100px;
+    height: 16px;
+    background: #fff;
+    display: inline-block;
+    -webkit-border-radius: 0 12px 12px 0;
+    border-radius: 0 12px 12px 0;
+}
+
+.touchslider-demo .touchslider-next-in {
+    position: absolute; /* fix safari render font */
+    right: 10px;
+}
+
+.touchslider-demo .touchslider-prev-in {
+    position: absolute;
+    left: 10px;
+}
+
+.touchslider-demo .touchslider-nav-item {
+    width: 6px;
+    height: 6px;
+    background: #fff;
+    margin: 0 1px;
+    display: inline-block;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+}
+
+.touchslider-demo .touchslider-nav-item-current {
+    background: #bdbeae;
+}
+
+/* social slider */
+.section-download {
+    position: relative;
+    padding-right: 230px;
+}
+
+.social {
+    width: 200px;
+    position: absolute;
+    right: 20px;
+    top: 0;
+}
+
+.touchslider-social .touchslider-nav {
+    text-align: center;
+    margin-bottom: 6px;
+}
+
+.touchslider-social .touchslider-nav-item {
+    opacity: .5;
+    padding: 0 2px;
+}
+
+.touchslider-social .touchslider-nav-item-current {
+    opacity: 1;
+}

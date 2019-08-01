@@ -1,0 +1,102 @@
+
+/**************通用的***************/
+html{ font-family: Helvetica, 'Hiragino Sans GB', 'Microsoft Yahei', '微软雅黑', Arial, sans-serif; font-size: 12px;}
+*{ padding: 0px; margin: 0px;}
+.fg-red{ color: #FD3B57}
+.fg-orange{ color: #FF8040}
+.bg-eee{ background-color: #EEEEEE;}
+body.frame_body #header{ height: 1.3rem; background-color: #FD3B57;}
+body.frame_body div#main{ }
+.b{ font-weight: bold;}
+.c{ clear: both;}
+.tx-c{ text-align: center;}
+.tx-r{ text-align: right;}
+.tx-l{ text-align: left;}
+.fl{ float: left;}
+.fr{ float: right;}
+.w-100{ width: 100%;}
+.w-95{ width: 95%;}
+.w-90{ width: 90%;}
+.w-80{ width: 80%;}
+.w-70{ width: 70%;}
+.w-60{ width: 60%;}
+.w-50{ width: 50%;}
+.w-40{ width: 40%;}
+.w-30{ width: 30%;}
+.w-20{ width: 20%;}
+.w-10{ width: 10%;}
+.w-05{ width: 5%;}
+.mui-btn-block.dsib{ display: inline-block;}
+*.dsib{ display: inline-block;}
+button[class^="but_"]{ border: 0px; outline: 0px;}
+button[class^="but_"]:active{ -moz-box-shadow:2px 2px 5px #CCCCCC, 2px 2px 5px #CCCCCC; -webkit-box-shadow:2px 2px 5px #CCCCCC, 2px 2px 5px #CCCCCC; box-shadow:2px 2px 5px #CCCCCC, 2px 2px 5px #CCCCCC;}
+button.but_green{ background: #02A346; color: #FFFFFF; font-size: 13px; display: block; width: 80%; padding: 0px; height: 40px; line-height: 40px; border-radius: 5px; margin: 5px auto;font-size: 1.1rem}
+button.but_red{ background: #d81e06; color: #FFFFFF; font-size: 13px; display: block; width: 80%; padding: 0px; height: 40px; line-height: 40px; border-radius: 5px; margin: 5px auto;font-size: 1.1rem}
+span.cirl_icon.min{width: 0.45rem; height: 0.45rem;}
+.box_middle{webkit-box-pack:center; -moz-box-pack:center; -webkit-box-align:center; -moz-box-align:center;display: -webkit-box;display: -moz-box;}
+.alpha_0{filter:alpha(opacity=0);-moz-opacity:0;opacity:0;}
+.ovd_s{ white-space:nowrap; text-overflow:ellipsis; -o-text-overflow:ellipsis; overflow: hidden;  }
+.frame_body select{ border:none; outline: none; list-style: none; font-size: 0.36rem; height:0.8rem; line-height:0.8rem; position: relative; top: -0.25rem; display:inline-block;-webkit-user-select: text;-webkit-appearance: none}
+div.mask{ position: fixed;top:0px;left:0px;background: rgba(38, 31, 30, .95); width: 100%; height: 100%; z-index: 11;}
+li,ul{ list-style: none;}
+button.but_1_1{color: #152D4C; border-radius: 5px; padding: 2px 10px;font-size: 1.2rem}
+button.but_1_2{  color: #FFFFFF; background: #1277ff; border-radius: 5px; padding: 2px 10px;font-size: 1.2rem}
+button.but_1_2[disabled="disabled"]{ background: #CCCCCC; color: #555}
+button.but_1{ color: #FFF; background: #152D4C; border-radius: 5px; padding: 3px 25px; height: 40px;font-size: 1.25rem}
+button.but_2{ color: #FFF; background: #1277ff; border-radius: 5px; padding: 3px 25px; height: 40px;font-size: 1.25rem}
+button.but_3{ color: #FFF; background: #d81e06; border-radius: 5px; padding: 3px 25px; height: 40px; font-size: 1.25rem}
+*.red{ color: #d81e06}
+*.blue{ color: #1296db}
+*.grey{ color: #7c7c7c
+}
+*.orange{ color: #edbe66
+}
+*.none{ display: none}
+
+
+/*二级切换*/
+.tab_bar{ display: flex; margin: 5px auto; width: 95%; }
+.tab_bar>.item{flex:1;border: 1px solid #152D4C; border-right: 0px; font-size: 15px; text-align: center; height: 35px; line-height: 35px;}
+.tab_bar>.item:last-child{ border-top-right-radius: 5px;border-bottom-right-radius: 5px;border-right: 1px solid #152D4C; }
+.tab_bar>.item:first-child{ border-top-left-radius: 5px;border-bottom-left-radius: 5px;}
+.tab_bar>.item.curr{ background:#152D4C; color: #FFF; }
+
+/*flex*/
+.flex-box-between {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.flex-box-center {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.flex-box {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+}
+.margin-b-10{
+  margin-bottom: 10px;
+}
+.margin-b-rem{
+  margin-bottom: 1rem;
+}
+.margin-t-10{
+  margin-top: 10px;
+}
+.flex-con {
+    -webkit-box-flex: 1;
+    -webkit-flex: 1;
+    flex: 1;
+}
+/* 清除inputnumber下默认样式 */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}

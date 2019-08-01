@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>otc交易界面</title>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/base.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/touchslider.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/coin.css" />
+    <script src="../../script/const.js"></script>
+    <style>
+    html,body{
+        font-size: 16px;
+        background: #fff;
+    }
+        .com_head{
+          position: fixed;
+          top: 0;
+        }
+        .com_head>.title {
+            font-size: 14px;
+        }
+
+        .title .active {
+            font-size: 20px;
+        }
+
+        .title span {
+            width: 30px;
+            padding: 0 5px;
+            -webkit-transition: all 300ms linear;
+            -moz-transition: all 300ms linear;
+            -o-transition: all 300ms linear;
+            -ms-transition: all 300ms linear;
+            transition: all 300ms linear;
+        }
+
+        .coin_type {
+            /*height: 40px;*/
+            background: #fff;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #F1F3F5;
+            color: #8F9EAB;
+            font-size: 14px;
+            padding: 0 10px;
+            position: fixed;
+            top:50px;
+            left: 0;
+            width: 100%;
+        }
+
+        .item_coin {
+            padding: 10px 0;
+            margin: 0 10px;
+            border-bottom: 2px solid transparent;
+        }
+
+        .item_coin.active {
+            color: #3F81CE;
+            border-bottom: 2px solid #3F81CE;
+        }
+        .coin_list{
+          padding-top: 90px;
+        }
+        .coin_list .item {
+            padding: 20px;
+            background: #fff;
+            border-bottom: 1px solid #F0F2F4;
+        }
+
+        .gray {
+            font-size: 14px;
+            color: #909FAC;
+        }
+
+        .top {
+            color: #263E56;
+            font-size: 14px;
+        }
+
+        .top .userImg {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+
+        .bigSize {
+            font-size: 18px;
+            color: #3D80CE;
+        }
+
+        .payIcon {
+            width: 25px;
+            height: 25px;
+            margin-right: 10px;
+            display: inline-block;
+        }
+
+        .buyCoin {
+            background: #3D80CE;
+            color: #fff;
+            width: 100px;
+            border-radius: 0.15rem;
+            text-align: center;
+            padding: 5px 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <!--头部标题-->
+        <header id="pack" class="aui-bar aui-bar-nav com_head">
+            <div class="back_but" tapmode onclick="$A.closeWin('trade/otc_trade')"></div>
+            <div class="aui-title titlePack title">
+                <span :class="{'active':cur==0}" @click="change_type(0)">我要买</span>
+                <span :class="{'active':cur==1}" @click="change_type(1)">我要卖</span>
+            </div>
+            <span class="aui-pull-right aui-iconfont aui-icon-cert" @click="orderList()" style="font-size:22px;"></span>
+        </header>
+        <div v-show="cur==0">
+            <div class="coin_type">
+                <div class="item_coin" :class="{'active':coinType==0}" @click="change_coin(0)">ETH</div>
+                <div class="item_coin" :class="{'active':coinType==1}" @click="change_coin(1)">BTC</div>
+                <div class="item_coin" :class="{'active':coinType==2}" @click="change_coin(2)">DBC</div>
+            </div>
+            <div class="coin_list">
+                <div class="item" v-for="item in 10">
+                    <div class="top flex-box-between">
+                        <div class="b"><img src="../../images/user.png" alt="" class="userImg">长大抢小米</div>
+                        <div class="gray">16783 | 99%</div>
+                    </div>
+                    <div class="middle flex-box-between">
+                        <div class="gray">
+                            <div>数量 0.133005 BTC</div>
+                            <div>限额 ¥1000.00 - ¥4661.00</div>
+                        </div>
+                        <div class="gray tx-r">
+                            <div>单价</div>
+                            <div class="bigSize">¥69206.00</div>
+                        </div>
+                    </div>
+                    <div class="last flex-box-between">
+                        <div><img src="../../css/img/wx.png" alt="" class="payIcon"><img src="../../css/img/yhcard.png" alt="" class="payIcon"><img src="../../css/img/alipay.png" alt="" class="payIcon"></div>
+                        <div class="buyCoin" @click="buyCoin">购买</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div v-show="cur==1">
+
+        </div>
+    </div>
+</body>
+
+<script type="text/javascript" src="../../script/lib/api.js"></script>
+<script type="text/javascript" src="../../script/lib/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="../../script/lib/base.js"></script>
+<script type="text/javascript" src="../../script/lib/vue.js"></script>
+<script>
+    var app = new Vue({
+            el: "#app",
+            data: {
+                cur: 0,
+                coinType: 0
+            },
+            methods: {
+                change_type: function(type) {
+                    this.cur = type;
+                },
+                change_coin: function(type) {
+                    this.coinType = type;
+                },
+                buyCoin: function() {
+                    api.openFrame({
+                        name: 'buybox',
+                        url: 'buybox.html',
+                        rect: {
+                            x: 0,
+                            y: 0,
+                            w: 'auto',
+                            h: 'auto'
+                        },
+                        animation: {
+                            type: "fade", //动画类型（详见动画类型常量）
+                            subType: "from_bottom", //动画子类型（详见动画子类型常量）
+                            duration: 300 //动画过渡时间，默认300毫秒
+                        },
+                        bounces: false,
+                        bgColor: 'rgba(43,43,43,0.5)'
+                    });
+                },
+                orderList:function() {
+                  api.openFrame({
+                      name: 'orderList',
+                      url: '../trade/orderList.html'
+                  });
+                }
+            }
+        })
+
+</script>
+
+</html>

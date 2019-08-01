@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>ETH委托单</title>
+    <link rel="stylesheet" type="text/css" href="../../css/base.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/custom.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/touchslider.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/coin.css"/>
+    <script src="../../script/const.js"></script>
+</head>
+<body>
+<div id="app" class="entrust_page">
+
+    <!--头部标题-->
+    <div class="com_head">
+        <div class="back_but" @click="back()"></div>
+        <div class="title" v-text="curr_coin.name.replace('_','/')+'委托單'"></div>
+    </div>
+
+    <!--头部切换-->
+    <div class="tab_bar">
+        <div class="item" v-for="(val,key) in status_arr" v-text="val" :class="{curr:list_status==key}"
+             @click="change_list_status(key)"></div>
+    </div>
+
+
+    <div id="data_list" class="list" style="overflow: auto">
+        <div v-show="list.length>0" id="list_content">
+            <div class="item" v-for="(val,key) in list">
+                <div class="outer">
+                    <div class="top">
+                        <div class="icon_info">
+                            <img :src="curr_coin.img" onerror="image_load_error">
+                            <span v-text="curr_coin.name.replace('_','/').toUpperCase()"></span>
+                        </div>
+                        <div class="type" v-text="type_arr[val.type]">
+
+                        </div>
+                    </div>
+                    <div class="content">
+                        <div class="box">
+                            <div class="name">委托價格</div>
+                            <div class="value" v-text="val.price"></div>
+                        </div>
+                        <div class="box">
+                            <div class="name">委托量</div>
+                            <div class="value" v-text="val.num">1</div>
+                        </div>
+                        <div class="box">
+                            <div class="name">成交量</div>
+                            <div class="value" v-text="val.deal">0</div>
+                        </div><!--
+                        <div class="box">
+                            <div class="name">交易额</div>
+                            <div class="value" v-text="val.price">0</div>
+                        </div>-->
+                    </div>
+
+                    <div class="bottom">
+                        <div class="time"  v-text="$A.timestampToTime(val.addtime)"></div>
+                        <div class="status">
+                            <span v-show="val.status!=0" v-text="status_arr[val.status]"></span>
+                            <button v-show="val.status==0" class="but_1" style="height: 32px;" @click="cancel(val.id)">撤銷</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="c"></div>
+        </div>
+        <div v-show="list.length==0" class="no_data">
+            <img src="../../images/no_data.png" alt="">
+            <p>暫無數據...</p>
+        </div>
+    </div>
+
+
+</div>
+
+</body>
+</html>
+
+<script type="text/javascript" src="../../script/lib/api.js"></script>
+<script type="text/javascript" src="../../script/lib/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="../../script/lib/base.js"></script>
+<script type="text/javascript" src="../../script/lib/vue.js"></script>
+<script type="text/javascript" src="../../script/lib/iscroll.js"></script>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            list_status: 0,
+            curr_coin: {
+                "title": "",
+                "new_price": 133,
+                "amount": 133,
+                "ratio": "2215.67",
+                "name": "eth_cny",
+                "reference_value": 3.14,
+                "img": ""
+            },
+            list: [
+                /*{
+                    "id": "3501",
+                    "price": "0.06000000",
+                    "num": "13.00000000",
+                    "deal": "0.00000000",
+                    "type": "1",
+                    "addtime": "1546760539",
+                    "status": "0"
+                },
+                {
+                    "id": "3500",
+                    "price": "200.00000000",
+                    "num": "1.00000000",
+                    "deal": "1.00000000",
+                    "type": "1",
+                    "addtime": "1546745760",
+                    "status": "0"
+                },
+                {
+                    "id": "3500",
+                    "price": "200.00000000",
+                    "num": "1.00000000",
+                    "deal": "1.00000000",
+                    "type": "1",
+                    "addtime": "1546745760",
+                    "status": "0"
+                },
+                {
+                    "id": "3500",
+                    "price": "200.00000000",
+                    "num": "1.00000000",
+                    "deal": "1.00000000",
+                    "type": "1",
+                    "addtime": "1546745760",
+                    "status": "0"
+                },
+                {
+                    "id": "3500",
+                    "price": "200.00000000",
+                    "num": "1.00000000",
+                    "deal": "1.00000000",
+                    "type": "1",
+                    "addtime": "1546745760",
+                    "status": "0"
+                },
+                {
+                    "id": "3500",
+                    "price": "200.00000000",
+                    "num": "1.00000000",
+                    "deal": "1.00000000",
+                    "type": "1",
+                    "addtime": "1546745760",
+                    "status": "0"
+                },
+                {
+                    "id": "3500",
+                    "price": "200.00000000",
+                    "num": "1.00000000",
+                    "deal": "1.00000000",
+                    "type": "1",
+                    "addtime": "1546745760",
+                    "status": "0"
+                },
+                {
+                    "id": "3500",
+                    "price": "200.00000000",
+                    "num": "1.00000000",
+                    "deal": "1.00000000",
+                    "type": "1",
+                    "addtime": "1546745760",
+                    "status": "0"
+                },
+                {
+                    "id": "3500",
+                    "price": "200.00000000",
+                    "num": "1.00000000",
+                    "deal": "1.00000000",
+                    "type": "1",
+                    "addtime": "1546745760",
+                    "status": "0"
+                }*/
+            ],
+            type_arr: ['買入', '賣出'],
+            status_arr: ['交易中', '已完成', '已撤銷'],
+            page: 1,
+            no_more: false       //是否有更多可以加载
+        },
+        mounted: function () {
+            var $this = this
+            setTimeout(function () {
+                //$this.list = []
+                $this.get_data()
+
+                $this.curr_coin = $api.getStorage('choose_trade_pairs_data')
+                // 监听属性
+                api.addEventListener({
+                    name: 'user_center_entrust_list_reflush'
+                }, function (ret, err) {
+                    $this.curr_coin = $api.getStorage('choose_trade_pairs_data')
+                    $this.list = []
+                    $this.page = 1
+                    $this.list_status = 0
+                    $this.no_more=false
+                    $this.get_data()
+                });
+                set_scroll_div()
+            }, 600)
+        },
+        methods: {
+
+            // 获取数据
+            get_data: function (data) {
+                var $this = this
+                var params = {
+                    market: $this.curr_coin.name,
+                    status: $this.list_status,
+                    page: $this.page,
+                }
+                if ($this.no_more) {
+                    return
+                }
+                $A.request('trade/get_list', params, function (data) {
+                    // $A.alert(JSON.stringify(data))
+                    if (data.length === 0) {
+                        $this.no_more = true
+                        //$A.toast('没有数据了...')
+                        return
+                    }
+                    $.each(data, function (i, obj) {
+                        $this.list.push(obj)
+                    })
+                    $this.page += 1
+                    $this.$forceUpdate()
+                    $('#list_content').height($this.list.length * 152)
+                })
+            },
+
+            back: function () {
+                $A.change_frame($api.getStorage('choose_trade_pairs_type_from'))
+            },
+
+            change_list_status: function (key) {
+                this.list_status = key
+                this.list = []
+                this.no_more = false
+                this.page = 1
+                this.get_data()
+            },
+
+            // 取消委托单
+            cancel: function (id) {
+                id = Number(id)
+                var $this = this
+                $A.confirm(function () {
+                    $A.request('trade/repeal', {
+                        id: id,
+                        status: this.list_status
+                    }, function (data) {
+                        $.each($this.list, function (i, obj) {
+                            if (obj.id === id) {
+                                $this.list[i]['status'] = 2
+                            }
+                        })
+                        $this.$forceUpdate()
+                    })
+                }, '您確認要進行該操作嗎?')
+            }
+        }
+    })
+
+
+    $(function () {
+        $('.entrust_page').css('Height', $A.get_body_height() + 'px')
+    })
+
+
+    // 设置滚到div标签
+    function set_scroll_div() {
+        var ID = 'data_list'
+        // 设置列表高度
+        var curr_height = $('.tab_bar').height() + $('.com_head').height() + Number($api.getStorage('StatusBarHeight')) + 10
+        $('#' + ID).height(api.winHeight - curr_height)
+        document.getElementById(ID).onscroll = function () {
+            var scrollHeight = document.getElementById(ID).scrollHeight;
+            var scrollTop = document.getElementById(ID).scrollTop;
+            var clientHeight = document.getElementById(ID).clientHeight;
+            if (scrollHeight - clientHeight === scrollTop) {
+                //滚动条滚到最底部
+                app.get_data()
+            }
+        };
+    }
+
+
+</script>

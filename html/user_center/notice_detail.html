@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>ETH委托单</title>
+    <link rel="stylesheet" type="text/css" href="../../css/base.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/custom.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/touchslider.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/coin.css"/>
+    <script src="../../script/const.js"></script>
+</head>
+<body>
+<div id="app" class="notice_detail_page" v-clock>
+
+    <!--头部标题-->
+    <div class="com_head">
+        <div class="back_but"  onclick="$A.change_frame('user_center_notice_list')"></div>
+        <div class="title">公告詳情</div>
+    </div>
+
+    <div class="title tx-c">
+        <span  v-text="title"></span>
+    </div>
+    <div class="info_row">
+        <!--<div class="from">来源: <span>{{from}}</span></div>-->
+        <div class="time">{{$A.timestampToTime(addtime)}}</div>
+    </div>
+
+    <div class="content" v-html="content">
+    </div>
+
+
+</div>
+
+</body>
+</html>
+
+<script type="text/javascript" src="../../script/lib/api.js"></script>
+<script type="text/javascript" src="../../script/lib/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="../../script/lib/base.js"></script>
+<script type="text/javascript" src="../../script/lib/vue.js"></script>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            title: '',
+            // from:"CoinEgg",
+            addtime: 0,
+            content: ''
+        },
+        mounted: function () {
+            //this.init();
+            var $this = this
+            setTimeout(function () {
+                $this.get_detail()
+
+                // 监听属性
+                api.addEventListener({
+                    name: 'user_center_notice_detail_reflush'
+                }, function(ret, err) {
+                    $this.get_detail()
+                });
+            }, 300)
+
+
+        },
+        methods: {
+            get_detail: function () {
+                var id = Number($api.getStorage('notice_detail_id'))
+                // console.log(id);
+                // $A.alert(id)
+                var $this = this
+                // $api.setStorage('notice_detail_id', null)
+                if (id > 0) {
+                    $A.request('news/show', {id: id}, function (data) {
+                        /*$A.alert('标题'+data.title)
+                        $A.toast('详情'+data.content)*/
+                        $this.title = data.title
+                        $this.addtime = data.addtime
+                        $this.content = data.content
+                        $this.$forceUpdate()
+                    },null,null,true)
+                }
+
+
+            }
+        }
+    })
+
+    $(function () {
+        $('.notice_detail_page').css('minHeight', $A.get_body_height() + 'px')
+    })
+</script>

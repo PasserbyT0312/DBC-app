@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>币种选择</title>
+    <link rel="stylesheet" type="text/css" href="../../css/base.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/custom.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/touchslider.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/coin.css"/>
+    <script src="../../script/const.js"></script>
+</head>
+<body>
+<div id="app" class="choose_currency_page">
+
+    <!--头部标题-->
+    <div class="com_head">
+        <div class="back_but" @click="back()"></div>
+        <div class="title">交易對-選擇</div>
+    </div>
+
+    <div class="input_outer">
+        <div class="search_icon"></div>
+        <input type="text" :model="search_key" placeholder="請輸入簡稱/首字母">
+    </div>
+
+    <div class="line">請選擇:</div>
+
+    <div class="coin_list">
+        <div class="item" v-for="val in arr" v-if="search_key.length==0 || val.name.indexOf(search_key)>-1">
+            <div class="con" :class="{curr:curr_data.name===val.name}" @click="curr_data=val;sure()">
+                <img :src="val.img" onerror="this.src=image_load_error">
+                <span v-text="val.market_name"></span>
+            </div>
+        </div>
+        <div class="c"></div>
+    </div>
+
+</div>
+
+</body>
+</html>
+
+<script type="text/javascript" src="../../script/lib/api.js"></script>
+<script type="text/javascript" src="../../script/lib/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="../../script/lib/base.js"></script>
+<script type="text/javascript" src="../../script/lib/vue.js"></script>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            curr_data: {
+                name: 'otc',
+                img: '../../images/coin_icon.png',
+            },
+            search_key: '',
+            arr: [
+                // {
+                //     "title": "以太坊(ETH/CNY)",
+                //     "name": "eth_cny",
+                //     "img": "http://ks.hjtyc888.com/Upload/coin/eth.png"
+                // },
+                // {
+                //     "title": "环球游学(GSTC/CNY)",
+                //     "name": "gstc_cny",
+                //     "img": "http://ks.hjtyc888.com/Upload/coin/gstc.png"
+                // },
+                // {
+                //     "title": "CSCQ(CSCQ/CNY)",
+                //     "name": "cscq_cny",
+                //     "img": "http://ks.hjtyc888.com/Upload/coin/cscq.png"
+                // }
+            ]
+        },
+        mounted: function () {
+            var $this=this
+            setTimeout(function () {
+                $this.arr = $A.get_trade_pairs_data()
+            },600)
+        },
+        methods: {
+            sure: function () {
+                var $this=this
+                $api.setStorage('choose_trade_pairs_data',$this.curr_data)
+                var type = $api.getStorage('choose_trade_pairs_type')
+                switch (type) {
+                    // 交易
+                    case 'trade':
+                        api.sendEvent({
+                            name: 'trade_index_change_coin',
+                            extra: $this.curr_data
+                        });
+                        $A.change_frame('trade_index')
+                        break;
+                    // 委托单
+                    case 'entrust_list':
+                        $A.change_frame('user_center_entrust_list')
+                        break
+                }
+            },
+            back:function () {
+                $A.change_frame($api.getStorage('choose_trade_pairs_type_from'))
+            }
+        }
+    })
+
+    $(function () {
+        $('.choose_currency_page').css('minHeight', $A.get_body_height() + 'px')
+    })
+</script>

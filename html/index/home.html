@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>主页</title>
+    <link rel="stylesheet" type="text/css" href="../../css/base.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/custom.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/touchslider.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/coin.css"/>
+    <script src="../../script/const.js"></script>
+</head>
+<body>
+<div id="app">
+    <!--<div style="width: 100%; padding: 5px;text-align: center;"><img src="../../css/img/logo.png" style="height: 30px">-->
+    <!--</div>-->
+    <!-- slider start -->
+    <div id="slider" class="mui-slider" style="overflow: hidden; position: relative;">
+        <div class="touchslider touchslider-demo">
+
+        </div>
+    </div>
+
+    <!--<div class="slider_tag" style="display: none;">
+        <div class="touchslider-viewport">
+            <div style="width:10000px">
+                <div class="touchslider-item" v-for="(obj,i) in banner_list">
+                    <img :src="obj.img" onerror="this.src=image_load_error"/>
+                </div>
+            </div>
+        </div>
+        <div class="touchslider-nav">
+            <a class="touchslider-nav-item" v-for="(obj,i) in banner_list"></a>
+        </div>
+    </div>-->
+    <!-- slider end -->
+    <!--
+    <em class="coin coin_30 coin_coin coin_eos"></em>
+    -->
+    <div class="news_box" onclick="$A.change_frame('user_center_notice_list')">
+        <div class="icon"></div>
+        <div class="title">
+            <div class="con ovd_s" v-text="news_info.title"></div>
+        </div>
+    </div>
+
+    <div class="market_top">
+        <div class="item" v-for="(val,key) in top_market">
+            <div class="name" v-text="val.market"></div>
+            <div class="price" v-text="val.price" :class="{oragen:key===1}"></div>
+            <div class="rate" v-text="val.rate" :class="{oragen:key===1}"></div>
+            <div class="rate" v-text="val.rmb" :class="{oragen:key===1}"></div>
+        </div>
+    </div>
+    <div onclick="$A.openWin('trade/otc_trade')">
+      进入otc
+    </div>
+    <div class="coin_type_list">
+        <div class="coin_type_list_con none">
+            <!-- <div class="item">
+                 <div class="name">自选区</div>
+             </div>-->
+            <div class="item">
+                <div class="name">BTC</div>
+            </div>
+            <div class="item">
+                <div class="name">ETH</div>
+            </div><!--
+            <div class="item">
+                <div class="name">USDT</div>
+            </div>
+            <div class="item">
+                <div class="name">USC</div>
+            </div>-->
+            <div class="c"></div>
+        </div>
+    </div>
+    <div class="active_list">
+        <!--<div class="item" style="display: flex;border-top: 1px solid #EEE; height: 50px;">-->
+        <!--<div class="info-box">-->
+        <!--<div class="title">C2C交易</div>-->
+        <!--<div class="sub_title">方便快捷</div>-->
+        <!--</div>-->
+        <!--<img src="../../images/active-0.jpg" style="position: absolute;right: 10%">-->
+        <!--</div>-->
+        <div class="item">
+            <div style="flex: 1;border-right: 1px solid #EEE;" @click="jumpElse()">
+                <div class="info-box">
+                    <div class="title">Token果园</div>
+                    <div class="sub_title">產出12%的DBC</div>
+                </div>
+                <img src="../../images/active-1.png" alt="">
+            </div>
+            <div style="flex: 1;">
+                <div class="info-box">
+                    <div class="title">合約系統</div>
+                    <div class="sub_title">2020年2月上線</div>
+                </div>
+                <img src="../../images/active-2.png" alt="">
+            </div>
+        </div>
+        <div class="c"></div>
+    </div>
+    <div class="coin_order_type_list">
+        <div class="order_item coin_type">
+            <span class="name">幣種</span>
+            <!--<em class="order_type"></em>-->
+        </div>
+        <div class="order_item price">
+            <span class="name">最新價</span>
+            <!--<em class="order_type asc"></em>-->
+        </div>
+        <div class="order_item up_down">
+            <span class="name">日跌漲</span>
+            <!--<em class="order_type desc"></em>-->
+        </div>
+    </div>
+
+    <div class="coin_info_list" style="margin-bottom: 30px;">
+      <div class="rows" v-for="(obj,i) in market_list" @click="trade_pairs_detail(obj)">
+          <div class="icon_box">
+              <img :src="obj.img" onerror="this.src=image_load_error" alt="">
+          </div>
+          <div class="info_box">
+              <div class="item">
+                  <div class="left_item">
+                      <span class="name" v-text="obj.title"></span>
+                      <span class="alias" v-text="obj.name.split('_')[1]"></span>
+                  </div>
+                  <div class="right_item">
+                      <span class="price" v-text="ToDouble(obj.new_price)"></span>
+                  </div>
+                  <div class="c"></div>
+              </div>
+              <div class="item">
+                  <div class="left_item">
+                      <span class="trade_nums" v-text="'成交量 '+ read_number(obj.amount)">
+                      </span>
+                  </div>
+                  <div class="right_item">
+                      <span class="btc_price" v-text="'≈'+obj.cny+' CNY'">
+                      </span>
+                  </div>
+                  <div class="c"></div>
+              </div>
+          </div>
+          <div class="up_down_box">
+              <div class="value" :class="obj.ratio<=0?'up':'down'">
+                  <span v-text="obj.ratio>0?'+'+ToDouble(obj.ratio):ToDouble(obj.ratio)"
+                        style="display: inline-block; height: 20px; width: 80%;" class="ovd_s"></span>
+              </div>
+          </div>
+        <!-- <div class="rows" v-for="(obj,i) in market_list" @click="trade_pairs_detail(obj)">
+            <div class="icon_box">
+                <img :src="obj.img" onerror="this.src=image_load_error" alt="">
+            </div>
+            <div class="info_box">
+                <div class="item">
+                    <div class="left_item">
+                        <span class="name" v-text="obj.title"></span>
+                        <span class="alias" v-text="obj.name.split('_')[1]"></span>
+                    </div>
+                    <div class="right_item">
+                        <span class="price" v-text="ToDouble(obj.new_price)"></span>
+                    </div>
+                    <div class="c"></div>
+                </div>
+                <div class="item">
+                    <div class="left_item">
+                        <span class="trade_nums" v-text="'成交量 '+ read_number(obj.amount)">
+                        </span>
+                    </div>
+                    <div class="right_item">
+                        <span class="btc_price" v-text="'≈'+2002.05+' CNY'">
+                        </span>
+                    </div>
+                    <div class="c"></div>
+                </div>
+            </div>
+            <div class="up_down_box">
+                <div class="value" :class="obj.ratio<=0?'up':'down'">
+                    <span v-text="obj.ratio>0?'+'+ToDouble(obj.ratio):ToDouble(obj.ratio)"
+                          style="display: inline-block; height: 20px; width: 80%;" class="ovd_s"></span>
+                </div>
+            </div> -->
+        </div>
+        <div class="c"></div>
+    </div>
+
+
+    <div id="footer">
+        <ul class="footer-nav">
+            <li class="index_page selected">
+                <div class="icon"></div>
+                <div class="name">首頁</div>
+            </li>
+            <li class="trade_page">
+                <div class="icon"></div>
+                <div class="name">交易</div>
+            </li>
+            <li class="otc_page">
+                <div class="icon"></div>
+                <div class="name">資產</div>
+            </li>
+            <li class="user_center_page">
+                <div class="icon"></div>
+                <div class="name">我的</div>
+            </li>
+        </ul>
+    </div>
+</div>
+
+</body>
+</html>
+
+<script type="text/javascript" src="../../script/lib/api.js"></script>
+<script type="text/javascript" src="../../script/lib/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="../../script/lib/base.js"></script>
+<script type="text/javascript" src="../../script/lib/jquery.touchslider.js"></script>
+<script type="text/javascript" src="../../script/lib/vue.js"></script>
+<script>
+    var market_list = [];
+
+    var app = new Vue({
+        el: '#app',
+        data: {
+            banner_list: [
+                {
+                    "img": "http://ks.hjtyc888.com/Upload/app/5c285cf3e5891.jpg",
+                    "url": "http://www.baidu.com",
+                    "name": "圖片1"
+                },
+                {
+                    "img": "http://ks.hjtyc888.com/Upload/app/5c285d129b482.png",
+                    "url": "ddd",
+                    "name": "圖片2"
+                }
+            ],
+            top_market: [
+                {
+                    "market": "BTC/USDT",
+                    "price": "9765.78",
+                    "rate": "0.87%",
+                    "rmb":"≈67505.51 CNY"
+                },
+                {
+                    "market": "ETH/USDT",
+                    "price": "213.08",
+                    "rate": "0.42%",
+                    "rmb":"≈1472.38 CNY"
+                },
+                {
+                    "market": "DBC/USDT",
+                    "price": "1.09",
+                    "rate": "0.05%",
+                    "rmb":"≈6.9097 CNY"
+                }
+            ],
+            news_info: {
+                "id": "166",
+                "title": "最新公告"
+            },
+            market_list: []
+        },
+        mounted: function () {
+            //this.init();
+            var $this = this
+
+            $('.active_list')
+
+            setTimeout(function () {
+
+                var banner_size = {
+                    width: api.winWidth,
+                    height: api.winWidth * 0.5,
+                };
+                $('#slider').css(banner_size)
+                //var curr_height = $('#footer').height() + $('#slider').height() + $('.news_box').height()+ $('.active_list').height() + $A.getStatusHeight() + $A.getSafeAreaBottomHeight() + 35 + 40
+                //$('.coin_info_list').height(api.winHeight - curr_height)
+                $this.get_data()
+
+
+            }, 600)
+        },
+        methods: {
+
+            //初始化banner
+            init: function (data) {
+                var img_arr = []
+                var title_arr = []
+                $.each(this.banner_list, function (key, val) {
+                    img_arr.push(val.img)
+                    //title_arr.push(val.name)
+                })
+                // $.each(this.banner_list, function (key, val) {
+                //     img_arr.push({
+                //         url: val.img
+                //     })
+                //     //title_arr.push(val.name)
+                // })
+                // var UICoverFlow = api.require('UICoverFlow');
+                // UICoverFlow.open({
+                //     rect: {
+                //         x: 0,
+                //         y: 0,
+                //         w: $('#slider').width(),
+                //         h: $('#slider').height()
+                //     },
+                //     styles: {
+                //         bg: '#FFFFFF',
+                //         image: {
+                //             activeW: api.winWidth * 0.7,
+                //             activeH: $('#slider').height() * 0.7,
+                //             corner: 10,
+                //             placeholder: 'widget://placeholder.png'
+                //         },
+                //         indicator: {                        //（可选项）JSON 类型；指示器的样式设置；默认：未设置时不显示
+                //             bg: '#eee',                    //（可选项）字符串类型；指示器未激活时的背景，支持 rgb，rgba，#；默认：#eee
+                //             active: '#807a79',                //（可选项）字符串类型；指示器激活时的背景，支持 rgb，rgba，#；默认：#eee
+                //         }
+                //
+                //     },
+                //     images: img_arr,
+                //     index: 1,
+                //     interval: 2000,
+                //     fixedOn: api.frameName,
+                //     fixed: false
+                // }, function (ret, err) {
+                //     // if (ret) {
+                //     //     $A.toast(JSON.stringify(ret));
+                //     // } else {
+                //     //     $A.toast(JSON.stringify(err));
+                //     // }
+                // });
+                var UIScrollPicture = api.require('UIScrollPicture');
+                UIScrollPicture.open({
+                    rect: {
+                        x: 0,
+                        y: 0,
+                        w: $('#slider').width(),
+                        h: $('#slider').height()
+                    },
+                    data: {
+                        paths: img_arr,
+                        captions: title_arr
+                    },
+                    styles: {
+                        caption: {
+                            height: 0,
+                            color: '#333333',
+                            size: 13,
+                            bgColor: '#FFFFFF',
+                            position: 'bottom'
+                        },
+                        indicator: {
+                            dot: {
+                                w: 10,
+                                h: 10,
+                                r: 5,
+                                margin: 10
+                            },
+                            align: 'center',
+                            color: '#FFFFFF',
+                            activeColor: '#c0c0bd'
+                        }
+                    },
+                    contentMode: 'scaleToFill',
+                    interval: 3,
+                    fixedOn: api.frameName,
+                    loop: true,
+                    fixed: false
+                }, function (ret, err) {
+                    /*if (ret) {
+                        $A.alert(JSON.stringify(ret));
+                    } else {
+                        $A.alert(JSON.stringify(err));
+                    }*/
+                });
+            },
+
+            // 格式化数量
+            read_number: function (number) {
+                if (number / 10000 > 1) {
+                    return (number / 10000).toFixed(2) + "万"
+                } else {
+                    return number
+                }
+            },
+
+            // 请求拉取数据
+            get_data: function () {
+                var $this = this
+                var set_data = function (data) {
+                    //$A.alert(JSON.stringify(data.banner_list))
+                    $this.market_list = data.market_list
+                    var trade_pairs = []
+                    $.each($this.market_list, function (i, obj) {
+                        trade_pairs.push({
+                            title: obj.title,
+                            name: obj.name,
+                            img: obj.img,
+                            market_name: obj.market_name,
+                        })
+                    })
+                    $A.set_trade_pairs_data(trade_pairs)
+                    $this.banner_list = data.banner_list
+                    $this.news_info = data.news_info
+                    $this.$forceUpdate()
+
+                    setTimeout(function () {
+                        $this.init()
+                    }, 600)
+                }
+                $A.request('Market/index', {}, set_data, set_data)
+            },
+
+            trade_pairs_detail: function (val) {
+                var params = {
+                    title: val.title,
+                    name: val.name,
+                    img: val.img,
+                    market_name: val.market_name,
+                }
+                $api.setStorage('choose_trade_pairs_data', params)
+                api.sendEvent({
+                    name: 'trade_index_change_coin',
+                    extra: params
+                });
+                $A.change_frame('trade_index')
+            },
+
+            // 推广有礼跳转
+            my_spread: function () {
+                // $A.check_login(function () {
+                //     $A.change_frame('user_center_my_spread', 'index')
+                // })
+                $api.setStorage('notice_detail_id', '166');
+                $A.change_frame('user_center_notice_detail');
+            },
+            jumpElse:function () {
+              $A.check_login(function () {
+                var tokens = api.getPrefs({
+                    sync: true,
+                    key: 'token'
+                });
+                var params = {
+                    token: tokens
+                }
+                  var browser = api.require('webBrowser');
+                  $A.request('user/login_game', params, function (data) {
+                    var systemType = api.systemType;
+                    if(systemType=='ios'){
+                      api.openApp({
+                          iosUrl: data, //打开微信的，其中weixin为微信的URL Scheme
+                      });
+                    }else if(systemType=='android'){
+                      browser.open({
+                          url: data
+                      });
+                    }
+                  });
+              })
+            }
+        }
+    })
+
+    $A.footer_event()
+</script>

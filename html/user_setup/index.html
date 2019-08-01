@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>设置-首页</title>
+    <link rel="stylesheet" type="text/css" href="../../css/base.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/custom.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/touchslider.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/coin.css"/>
+    <script src="../../script/const.js"></script>
+</head>
+<body>
+<div id="app" class="set_up_index_page">
+
+    <!--头部标题-->
+    <div class="com_head blue">
+        <div class="back_but" onclick="$A.change_frame('user_center_index')"></div>
+        <div class="title">設置-首頁</div>
+    </div>
+
+    <div class="nav_list">
+        <div class="item" @click="auth_page()">
+            <div class="name">
+                身份認證
+                <div class="info" :class="idcardauth_class_arr[idcardauth]" v-text="idcardauth_arr[idcardauth]"></div>
+            </div>
+            <div class="arrow"></div>
+        </div>
+        <div class="item" onclick="$A.change_frame('user_setup_change_password')">
+            <div class="name">修改-登錄密碼</div>
+            <div class="arrow"></div>
+        </div>
+        <div class="item" onclick="$A.change_frame('user_setup_change_trade_password')">
+            <div class="name">修改-交易密碼</div>
+            <div class="arrow"></div>
+        </div>
+        <div class="item" onclick="$A.check_version(true)">
+            <div class="name">版本檢查</div>
+            <div class="arrow"></div>
+        </div>
+    </div>
+
+    <div class="login_out_outer">
+        <button class="but_3" onclick="$A.login_out()">
+            退出登錄
+        </button>
+    </div>
+
+
+</div>
+
+</body>
+</html>
+
+<script type="text/javascript" src="../../script/lib/api.js"></script>
+<script type="text/javascript" src="../../script/lib/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="../../script/lib/base.js"></script>
+<script type="text/javascript" src="../../script/lib/vue.js"></script>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            idcardauth:0,
+            idcardauth_arr:idcardauth_arr,idcardauth_class_arr:idcardauth_class_arr
+        },
+        mounted: function () {
+            var $this=this
+
+            // 认证信息提交完毕
+            setTimeout(function () {
+
+                api.addEventListener({
+                    name: 'auth_info_submit'
+                }, function(ret, err) {
+                    //$A.alert('获取到的值是: '+JSON.stringify(ret.value.status))
+                    $this.idcardauth = ret.value.status
+                    $this.$forceUpdate()
+                });
+
+                $this.idcardauth = $api.getStorage('idcardauth')-0
+                $this.$forceUpdate()
+            },600)
+            //this.idcardauth = $api.getStorage('idcardauth')
+        },
+        methods: {
+            // 认证页面
+            auth_page:function(){
+                if (this.idcardauth>0){
+                    $A.change_frame('user_setup_auth_result')
+                }else{
+                    $A.change_frame('user_setup_auth_submit')
+                }
+            },
+        }
+    })
+    $('#app').height($A.get_body_height())
+
+</script>

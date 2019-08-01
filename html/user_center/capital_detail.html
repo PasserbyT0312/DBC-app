@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>资产中心</title>
+    <link rel="stylesheet" type="text/css" href="../../css/base.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/custom.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/touchslider.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/coin.css"/>
+    <script src="../../script/const.js"></script>
+</head>
+<body>
+<div id="app" class="capital_page">
+
+    <!--头部标题-->
+    <!--<div class="com_head">-->
+    <!--<div class="back_but" v-show="from_page==='user_center_index'" onclick="$A.change_frame('user_center_index')"></div>-->
+    <!--<div class="title">资产中心</div>-->
+    <!--</div>-->
+
+    <!--
+
+    <div class="act_box">
+        <div class="item" onclick="$A.choose_currency('transfer_in')">
+            <div class="con">
+                <img src="../../css/img/chongzhi_icon.png">
+                <p>转入</p>
+            </div>
+        </div>
+
+        <div class="item" onclick="$A.choose_currency('transfer_out')">
+            <div class="con">
+                <img src="../../css/img/tixian_icon.png">
+                <p>转出</p>
+            </div>
+        </div>
+    </div>-->
+
+    <div class="all_info_box">
+        <div class="back_but" onclick="$A.change_frame('user_center_capital')">返回</div>
+        <div class="money-box">
+            <p v-text="'$'+dollar"></p>
+            <p v-text="'≈ '+gold"></p>
+            <!--<p v-text="money"></p>-->
+        </div>
+
+    </div>
+
+    <div class="coin_list">
+        <div class="item" v-for="val in list">
+            <div class="top_info">
+                <img :src="val.img" onerror="this.src=image_load_error" class="icon">
+                <span v-text="val.title"></span>
+            </div>
+            <div class="money_info">
+                <div class="money_item">
+                    可用:
+                    <span class="use_able" v-text="ToDouble(val.balance)">0.00</span>
+                </div>
+                <div class="money_item">
+                    凍結:
+                    <span class="frozen" v-text="ToDouble(val.frozen)">0.00</span>
+                </div>
+                <div class="money_item">
+                    合計:
+                    <span class="all" v-text="ToDouble(val.sum)">0.00</span>
+                </div>
+                <div class="c"></div>
+            </div>
+            <div class="act_bar">
+                <div class="item" @click="zhuanRu(val)">
+                    <img src="../../css/img/ic_chongbi.png" alt="">
+                    <span>充幣</span>
+                </div>
+                <div class="item"  @click="zhuanChu(val)">
+                    <img src="../../css/img/ic_tibi.png" alt="">
+                    <span>提幣</span>
+                </div>
+                <div class="item"  @click="zhangDan(val)">
+                    <img src="../../css/img/ic_bills.png" alt="">
+                    <span>賬單</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--底部导航-->
+    <div id="footer">
+        <ul class="footer-nav">
+            <li class="index_page">
+                <div class="icon"></div>
+                <div class="name">首頁</div>
+            </li>
+            <li class="trade_page">
+                <div class="icon"></div>
+                <div class="name">交易</div>
+            </li>
+            <li class="otc_page selected">
+                <div class="icon"></div>
+                <div class="name">資產</div>
+            </li>
+            <li class="user_center_page">
+                <div class="icon"></div>
+                <div class="name">我的</div>
+            </li>
+        </ul>
+    </div>
+</div>
+
+</body>
+</html>
+
+<script type="text/javascript" src="../../script/lib/api.js"></script>
+<script type="text/javascript" src="../../script/lib/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="../../script/lib/base.js"></script>
+<script type="text/javascript" src="../../script/lib/vue.js"></script>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            dollar: 0.00,
+            gold: '0.00 $',
+            from_page: '',
+            list: [
+                {},
+                {}
+            ]
+        },
+        mounted: function () {
+            var $this = this
+            setTimeout(function () {
+                $this.get_data()
+
+                setTimeout(function () {
+                    $this.from_page = $api.getStorage('from_page')
+                    var curr_height = $('#footer').height() + $('#act_box').height() + $('.com_head').height() + $A.getStatusHeight() + $A.getSafeAreaBottomHeight() + 155
+                    //$A.toast(curr_height)
+                    $('.coin_list').height(api.winHeight - (curr_height))
+                }, 600)
+
+                api.addEventListener({
+                    name: 'user_center_capital_detail_reflush'
+                }, function (ret, err) {
+                    $this.from_page = $api.getStorage('from_page')
+                    $this.get_data()
+                    $this.$forceUpdate()
+                });
+
+            }, 600)
+        },
+        methods: {
+            get_data: function () {
+                var $this = this
+                $A.request('finance/details', {}, function (data) {
+                    $this.dollar = data.sum_dollar
+                    $this.gold = data.sum_gold
+                    $this.list = data.coin_list
+                    $this.$forceUpdate()
+                },null, null, true)
+            },
+            zhuanRu:function (val) {
+                $api.setStorage('choose_currency_coin',val)
+                //$A.toast(val.name)
+                $A.change_frame('user_center_transfer_in')
+            },
+            zhuanChu:function (val) {
+                $api.setStorage('choose_currency_coin',val)
+                // $A.toast(val.name)
+                // return
+                $A.change_frame('user_center_transfer_out')
+            },
+            zhangDan:function (val) {
+                $api.setStorage('choose_currency_coin',val)
+                // $A.toast(val.name)
+                // return
+                $A.change_frame('user_center_coin_order_list')
+            }
+        }
+    })
+
+    $('.capital_page').css('minHeight', $A.get_body_height() + 'px')
+    $A.footer_event()
+
+</script>

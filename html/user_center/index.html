@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>个人中心</title>
+    <link rel="stylesheet" type="text/css" href="../../css/base.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/custom.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/touchslider.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/coin.css"/>
+    <script src="../../script/const.js"></script>
+</head>
+<body>
+<div id="app" class="user_center_page">
+    <div class="head">
+        <div class="top">
+            <div class="set_up_but" onclick="$A.change_frame('user_setup_index')"></div>
+            <!--<div class="custom_service_but"></div>-->
+        </div>
+        <div class="info">
+            <div class="icon_box" @click="change_icon()">
+                <img :src="head_img">
+            </div>
+            <div class="info_box">
+                <div class="row">
+                    <div class="left">賬號:</div>
+                    <div class="right">
+                        &nbsp;
+                        <span v-text="show_username()"></span>
+                    </div>
+                </div>
+                <div class="row" style="height: 50px; line-height: 50px;">
+                    <div class="left">認證狀態:</div>
+                    <div class="right" @click="auth_page()">
+                        <div class="red" v-show="idcardauth===0 || idcardauth===3">
+                            &nbsp;
+                            <img src="../../css/img/auth_un_complete.png" height="20"
+                                 style="position: relative; top: 3px;" alt="">
+                            &nbsp;
+                            <span v-text="idcardauth_arr[idcardauth]"></span>
+                        </div>
+                        <div class="blue" v-show="idcardauth===1">
+                            &nbsp;
+                            <img src="../../css/img/auth_complete_01.png" height="20"
+                                 style="position: relative; top: 3px;" alt="">
+                            &nbsp;
+                            已通過認證
+                        </div>
+                        <div class="red" v-show="idcardauth===2">
+                            &nbsp;
+                            <img src="../../css/img/auth_fail.png" height="20" style="position: relative; top: 3px;"
+                                 alt="">
+                            &nbsp;
+                            認證未通過
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!--资金信息-->
+    <div class="capital_box" onclick="$A.change_frame('user_center_capital','user_center_index')">
+        <div class="left">
+            <div class="info1">總資產</div>
+            <div class="info2" v-text="balance"></div>
+            <!--<div class="info3">≈ 15681.607CNY</div>-->
+        </div>
+        <div class="right">
+            <button></button>
+        </div>
+    </div>
+
+
+    <!--资金操作-->
+    <div class="capital_act_box">
+        <div class="item" onclick="$A.choose_currency('transfer_in')">
+            <img src="../../css/img/chongzhi_icon.png">
+            <span>轉入</span>
+        </div>
+        <div class="item" onclick="$A.choose_currency('transfer_out')">
+            <img src="../../css/img/tixian_icon.png">
+            <span>轉出</span>
+        </div>
+    </div>
+
+
+    <!--导航块-->
+    <div class="nav_list" style="margin-bottom: 20px;">
+        <div class="item" onclick="$A.choose_trade_pairs('entrust_list','user_center_index')">
+            <div class="icon">
+                <img src="../../css/img/user_center_weituo.png" alt="">
+            </div>
+            <div class="name">委托管理</div>
+            <div class="arrow"></div>
+        </div>
+
+        <div class="item" onclick="$A.change_frame('user_center_my_spread')">
+            <div class="icon">
+                <img src="../../css/img/user_center_tuiguang.png" alt="">
+            </div>
+            <div class="name">推廣信息</div>
+            <div class="arrow"></div>
+        </div>
+
+        <div class="item" onclick="$A.change_frame('user_center_notice_list')">
+            <div class="icon">
+                <img style="width: 40%;" src="../../css/img/user_center_xinwen.png" alt="">
+            </div>
+            <div class="name">系統公告</div>
+            <div class="arrow"></div>
+        </div>
+
+        <div class="item" onclick="$A.change_frame('user_center_about_us')">
+            <div class="icon">
+                <img src="../../css/img/user_center_guanyuwomen.png" alt="">
+            </div>
+            <div class="name">關於我們</div>
+            <div class="arrow"></div>
+        </div>
+    </div>
+
+    <!--底部导航-->
+    <div id="footer">
+        <ul class="footer-nav">
+            <li class="index_page">
+                <div class="icon"></div>
+                <div class="name">首頁</div>
+            </li>
+            <li class="trade_page">
+                <div class="icon"></div>
+                <div class="name">交易</div>
+            </li>
+            <li class="otc_page">
+                <div class="icon"></div>
+                <div class="name">資產</div>
+            </li>
+            <li class="user_center_page selected">
+                <div class="icon"></div>
+                <div class="name">我的</div>
+            </li>
+        </ul>
+    </div>
+</div>
+
+</body>
+</html>
+
+<script type="text/javascript" src="../../script/lib/api.js"></script>
+<script type="text/javascript" src="../../script/lib/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="../../script/lib/base.js"></script>
+<script type="text/javascript" src="../../script/lib/vue.js"></script>
+<script>
+
+    var app = new Vue({
+        el: '#app',
+        data: {
+            head_img: '../../images/user.png',
+            username: '',
+            idcardauth: 0,
+            balance: '',
+        },
+        mounted: function () {
+            var $this = this
+            setTimeout(function () {
+                $this.get_data()
+
+                // 认证信息提交完毕
+                api.addEventListener({
+                    name: 'auth_info_submit'
+                }, function (ret, err) {
+                    $this.idcardauth = ret.value.status
+                    $this.$forceUpdate()
+                });
+
+                // 页面刷新
+                api.addEventListener({
+                    name: 'user_center_index_reflush'
+                }, function (ret, err) {
+                    $this.get_data()
+                });
+            }, 600)
+
+
+        },
+        methods: {
+            // 显示用户名
+            show_username: function () {
+                if (this.username.length === 0) {
+                    return this.username
+                }
+                return this.username
+            },
+            // 认证页面
+            auth_page: function () {
+                if (this.idcardauth > 0) {
+                    $A.change_frame('user_setup_auth_result')
+                } else {
+                    $A.change_frame('user_setup_auth_submit')
+                }
+            },
+
+            // 更改头像
+            change_icon: function () {
+                var $this = this
+                api.actionSheet({
+                    title: '請選擇您的選取方式',
+                    cancelTitle: '取消',
+                    // destructiveTitle: '红色警告按钮',
+                      buttons: ['相冊', '拍照']
+                }, function (ret, err) {
+
+                    var index = ret.buttonIndex;
+                    if (index === 1) {
+                        $this.choose_by_album()
+                    }
+                    if (index === 2) {
+                        var cameraTool = api.require('cameraTool');
+                        cameraTool.openCamera(function (ret, err) {
+                            $this.upload_icon(ret.imgPath)
+                            //api.prompt({title: "信息", msg: "图片路径：" + ret.imgPath, buttons: ["取消", "确定"]});
+                        });
+                    }
+                    //$A.toast(index)
+                });
+            },
+
+            choose_by_album: function (type) {
+                var UIAlbumBrowser = api.require('UIAlbumBrowser');
+                var $this = this
+                UIAlbumBrowser.open({
+                    max: 1,
+                    styles: {
+                        bg: '#fff',
+                        mark: {
+                            icon: '',
+                            position: 'bottom_left',
+                            size: 20
+                        },
+                        nav: {
+                            bg: 'rgba(0,0,0,0.6)',
+                            titleColor: '#fff',
+                            titleSize: 18,
+                            cancelColor: '#fff',
+                            cancelSize: 16,
+                            finishColor: '#fff',
+                            finishSize: 16
+                        }
+                    },
+                    rotation: true
+                }, function (ret) {
+                    if (ret && ret.list && ret.list.length) {
+                        var image = ret.list[0]
+
+                        if ($A.isAndroid()){
+                            $this.upload_icon(image.path)
+                        }else{
+                            // iOS需要路径转化
+                            UIAlbumBrowser.transPath({
+                                path: image.path
+                            }, function(ret, err) {
+                                if (ret) {
+                                    $this.upload_icon(ret.path)
+                                } else {
+                                    //alert(JSON.stringify(err));
+                                }
+                            });
+                        }
+                    }
+                });
+            },
+
+            upload_icon:function(imgPath){
+                var $this=this
+                var fun = function (data) {
+                    $this.head_img = data
+                    $this.$forceUpdate()
+                    //$A.toast('头像地址是:'+data)
+                }
+                var fileParams = {}
+                fileParams['head_img'] = imgPath
+                var params={
+                    token: api.getPrefs({
+                        sync: true,
+                        key: 'token'
+                    })
+                }
+                $A.request('user/head_save',params , fun, null, fileParams)
+            },
+
+            // 获取信息
+            get_data: function () {
+                var $this = this
+                var fun = function (data) {
+                    $this.username = data.username
+                    $this.head_img = data.head_img
+                    $this.idcardauth = data.idcardauth - 0
+                    $this.balance = data.balance
+                    // 保存用户认证状态
+                    $api.setStorage('idcardauth', data.idcardauth)
+                    $this.$forceUpdate()
+                }
+                $A.request('user/base_info', {}, fun, fun, null, true)
+            }
+        }
+    })
+
+
+    $A.footer_event()
+
+</script>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>交易走势</title>
+    <link rel="stylesheet" type="text/css" href="../../css/base.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/custom.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/touchslider.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/coin.css"/>
+    <script src="../../script/const.js"></script>
+</head>
+<body>
+<div id="app" class="trade_chart_page">
+    <!--头部标题-->
+    <div class="com_head">
+        <div class="back_but" onclick="$A.change_frame('trade_index')"></div>
+        <div class="title">ETH/BTC</div>
+    </div>
+
+    <div class="overview">
+        <div class="left">
+            <div class="curr">0.041581</div>
+            <div class="pre">
+                <span class="trend_nums">0.00054172</span>
+                <span class="trend_percent">1.32%</span>
+            </div>
+        </div>
+
+        <div class="right">
+            <div class="item">買: 0.0415</div>
+            <div class="item">賣: 0.04162533</div>
+            <div class="item">高: 0.04212249</div>
+            <div class="item">低: 0.040823</div>
+            <div class="item">量: 6852</div>
+            <div class="item">額: 283.7497</div>
+        </div>
+    </div>
+
+    <div class="time_item">
+        <div class="item" v-for="(val,key) in time_item_arr" v-text="val.name" @click="change_curr_time(val)"
+             :class="{curr:val.value===curr_time}"></div>
+    </div>
+
+
+    <!--<div class="act_row">-->
+    <!--<div class="item">5分钟</div>-->
+    <!--<div class="item">均线</div>-->
+    <!--<div class="item">指标</div>-->
+    <!--<div class="item">深度</div>-->
+    <!--</div>-->
+
+    <!--<div class="real_time_info_row">-->
+    <!--2018-9-5 14:12:54 &nbsp;开: <span>0.0415</span>&nbsp;高: <span>0.0415</span>&nbsp;低: <span>0.0415</span>&nbsp;收: <span>0.0415</span>-->
+    <!--</div>-->
+
+    <div id="container"></div>
+
+
+</div>
+
+</body>
+</html>
+
+<script type="text/javascript" src="../../script/lib/api.js"></script>
+<script type="text/javascript" src="../../script/lib/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="../../script/lib/base.js"></script>
+<script type="text/javascript" src="../../script/lib/vue.js"></script>
+<script type="text/javascript" src="../../script/lib/echarts.min.js"></script>
+<script>
+
+    var app = new Vue({
+        el: '#app',
+        data: {
+            curr_time: 5,
+            time_item_arr: [{
+                name:'5分鐘',
+                value:5
+            },{
+                name:'15分鐘',
+                value:15
+            },{
+                name:'30分鐘',
+                value:30
+            },{
+                name:'1小時',
+                value:60
+            },{
+                name:'2小時',
+                value:120
+            },{
+                name:'1天',
+                value:1440
+            },{
+                name:'1周',
+                value:10080
+            }],
+        },
+        mounted: function () {
+            //this.init();
+            var $this=this
+            setTimeout(function () {
+                $this.change_curr_time()
+
+                api.addEventListener({
+                    name: 'trade_chart_reflush'
+                }, function (ret, err) {
+                    $this.change_curr_time()
+                });
+            },600)
+
+
+        },
+        methods: {
+
+            //初始化banner
+            init: function (data) {
+                var winWidth = get_win_width();
+                var banner_size = {
+                    width: winWidth,
+                    height: winWidth * 0.45,
+                };
+                $(".touchslider-viewport,.touchslider-demo,.touchslider-demo img").css(banner_size)
+                $('#slider').html($('#slider').html())
+                $(".touchslider-demo").touchSlider({mouseTouch: true});
+            },
+
+            read_number: function (number) {
+                if (number / 10000 > 1) {
+                    return (number / 10000).toFixed(2) + "萬"
+                } else {
+                    return number
+                }
+
+            },
+
+            change_curr_time: function (val) {
+                if (typeof val==='undefined'){
+                    val=this.time_item_arr[0]
+                }
+                this.curr_time = val.value
+                var fun=function (data) {
+                    // $A.toast(JSON.stringify(data))
+                    $A.charDemo.set_data(data, $("#container")[0]);
+                    //$A.charDemo.set_data(data, $("#container")[0]);
+                }
+                $A.request('market/chat', {time:val.value},fun ,fun, null, true)
+            }
+
+        }
+    })
+
+    $(function () {
+        $('.trade_chart_page').css('minHeight', $A.get_body_height() + 'px')
+        $('.trade_chart_page>#container').height($A.get_body_height() - $('.com_head').height() - $('.overview').height() - $('.act_row').height() - $('.real_time_info_row').height() - 20);
+
+        // 数据意义：开盘(open)，收盘(close)，最低(lowest)，最高(highest)
+        var data = [
+            ['2018/10/25', 2300, 2291.3, 2288.26, 2308.38],
+            ['2018/10/28', 2295.35, 2346.5, 2295.35, 2346.92],
+            ['2018/10/29', 2347.22, 2358.98, 2337.35, 2363.8],
+            ['2018/10/30', 2360.75, 2382.48, 2347.89, 2383.76],
+            ['2018/10/31', 2383.43, 2385.42, 2371.23, 2391.82],
+            ['2018/12/1', 2377.41, 2419.02, 2369.57, 2421.15],
+            ['2018/12/4', 2425.92, 2428.15, 2417.58, 2440.38],
+            ['2018/12/5', 2411, 2433.13, 2403.3, 2437.42],
+            ['2018/12/6', 2432.68, 2434.48, 2427.7, 2441.73],
+            ['2018/12/7', 2430.69, 2418.53, 2394.22, 2433.89],
+            ['2018/12/8', 2416.62, 2432.4, 2414.4, 2443.03],
+            ['2018/12/18', 2441.91, 2421.56, 2415.43, 2444.8],
+            ['2018/12/19', 2420.26, 2382.91, 2373.53, 2427.07],
+            ['2018/12/20', 2383.49, 2397.18, 2370.61, 2397.94],
+            ['2018/12/21', 2378.82, 2325.95, 2309.17, 2378.82],
+            ['2018/12/22', 2322.94, 2314.16, 2308.76, 2330.88],
+            ['2018/12/25', 2320.62, 2325.82, 2315.01, 2338.78],
+            ['2018/12/26', 2313.74, 2293.34, 2289.89, 2340.71],
+            ['2018/12/27', 2297.77, 2313.22, 2292.03, 2324.63],
+            ['2018/12/28', 2322.32, 2365.59, 2308.92, 2366.16]
+        ];
+
+        $A.charDemo.set_data(data, $("#container")[0]);
+    })
+
+
+</script>

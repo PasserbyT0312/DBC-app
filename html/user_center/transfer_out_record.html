@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>ETH转出-记录</title>
+    <link rel="stylesheet" type="text/css" href="../../css/base.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/custom.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/touchslider.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/coin.css"/>
+    <script src="../../script/const.js"></script>
+</head>
+<body>
+<div id="app" class="transfer_out_record_page">
+
+    <!--头部标题-->
+    <div class="com_head">
+        <div class="back_but" onclick="$A.change_frame('user_center_transfer_out')"></div>
+        <div class="title" v-text="curr_coin.name.toUpperCase()+'-轉出記錄'"></div>
+    </div>
+
+    <div v-show="list.length>0" id="data_list" class="list" style="overflow: auto">
+        <div class="item" v-for="val in list">
+            <div class="top">
+                <div class="time" v-text="$A.timestampToTime(val.addtime)"></div>
+                <div class="status" v-text="status_arr[val.status]"></div>
+            </div>
+            <div class="nums_row">
+                <div class="nums_item">
+                    <div class="name">輸入數量</div>
+                    <div class="nums" v-text="val.num"></div>
+                </div>
+                <div class="nums_item">
+                    <div class="name">到賬數量</div>
+                    <div class="nums" v-text="val.mum"></div>
+                </div>
+                <div class="nums_item">
+                    <div class="name">確認數量</div>
+                    <div class="nums" v-text="val.mum"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div v-show="list.length==0" class="no_data">
+        <img src="../../images/no_data.png" alt="">
+        <p>暫無數據...</p>
+    </div>
+
+</div>
+
+</body>
+</html>
+
+<script type="text/javascript" src="../../script/lib/api.js"></script>
+<script type="text/javascript" src="../../script/lib/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="../../script/lib/base.js"></script>
+<script type="text/javascript" src="../../script/lib/vue.js"></script>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            curr_coin: {
+                name: 'otc',
+                img: '../../images/coin_icon.png',
+            },
+            list:[
+
+            ],
+            status_arr:['處理中','成功'],
+            page: 1,
+            no_more: false       //是否有更多可以加载
+        },
+        mounted: function () {
+            var $this=this
+            setTimeout(function () {
+                $this.list = []
+                $this.page = 1
+                $this.no_more=false
+                $this.get_data()
+
+                // 监听属性
+                api.addEventListener({
+                    name: 'user_center_transfer_out_record_reflush'
+                }, function(ret, err) {
+                    $this.list = []
+                    $this.page = 1
+                    $this.no_more=false
+                    $this.get_data()
+                });
+
+                set_scroll_div()
+
+            },600)
+        },
+        methods: {
+
+            //初始化banner
+            get_data: function () {
+                var $this = this
+                $this.curr_coin = $api.getStorage('choose_currency_coin')
+                var params = {
+                    coin: $this.curr_coin.name,
+                    page: $this.page,
+                }
+                if ($this.no_more) {
+                    //$A.toast('没有数据了...')
+                    return
+                }
+                //$A.alert(JSON.stringify(params))
+                $A.request('finance/out_list',params, function (data) {
+                    if (data.length === 0) {
+                        $this.no_more = true
+                        //$A.toast('没有数据了...')
+                        return
+                    }
+                    $.each(data, function (i, obj) {
+                        $this.list.push(obj)
+                    })
+                    $this.page += 1
+                    $this.$forceUpdate()
+                    $('#list_content').height($this.list.length * 111)
+                })
+            },
+
+        }
+    })
+
+
+    $(function () {
+        $('.transfer_out_record_page').css('minHeight',$A.get_body_height()+'px')
+    })
+
+    function set_scroll_div() {
+        var ID = 'data_list'
+        // 设置列表高度
+        var curr_height= $('.com_head').height()+Number($api.getStorage('StatusBarHeight'))
+        $('#' + ID).height(api.winHeight - curr_height)
+        document.getElementById(ID).onscroll = function () {
+            var scrollHeight = document.getElementById(ID).scrollHeight;
+            var scrollTop = document.getElementById(ID).scrollTop;
+            var clientHeight = document.getElementById(ID).clientHeight;
+            if (scrollHeight - clientHeight === scrollTop) {
+                //滚动条滚到最底部
+                app.get_data()
+            }
+        };
+    }
+</script>

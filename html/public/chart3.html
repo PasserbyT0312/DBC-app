@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+</head>
+<body style="height: 100%; margin: 0; background: #CCCCCC">
+<div id="container" style="width: 100%; height: 450px"></div>
+<script type="text/javascript" src="../../script/lib/echarts.min.js"></script>
+<script type="text/javascript" src="../../script/lib/walden.js"></script>
+<script type="text/javascript">
+    var dom = document.getElementById("container");
+    var myChart = echarts.init(dom, 'walden');
+    option = null;
+    option = {
+        backgroundColor: '#FFFFFF',
+        legend: {
+            orient: 'vertical',
+            x: '10%',
+            y: '18%',
+            data: ['視頻廣告', '聯盟廣告', '郵件營銷', '直接訪問', '搜索引擎'],
+            itemHeight: '28',
+            textStyle: {
+                color: 'rgba(0, 0, 0, 0.8)',
+                fontSize: '30'
+            }
+        },
+        series: [
+            {
+                name: '訪問來源',
+                type: 'pie',
+                radius: '80%',
+                center: ['65%', '50%'],
+                data: [
+                    {value: 235, name: '視頻廣告'},
+                    {value: 274, name: '聯盟廣告'},
+                    {value: 310, name: '郵件營銷'},
+                    {value: 335, name: '直接訪問'},
+                    {value: 400, name: '搜索引擎'}
+                ],
+                label: {
+                    normal: {
+                        textStyle: {
+                            color: 'rgba(0, 0, 0, 0.8)',
+                            fontSize: '30'
+                        }
+                    }
+                },
+                labelLine: {
+                    normal: {
+                        lineStyle: {
+                            color: 'rgba(0, 0, 0, 0.3)'
+                        }
+                    }
+                },
+                itemStyle: {
+                    normal: {
+                        shadowBlur: 10,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                }
+            }
+        ]
+    };
+    ;
+    if (option && typeof option === "object") {
+        myChart.setOption(option, true);
+    }
+</script>
+</body>
+</html>

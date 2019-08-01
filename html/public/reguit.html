@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>注册</title>
+    <link rel="stylesheet" type="text/css" href="../../css/base.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/custom.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/touchslider.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/coin.css"/>
+    <script src="../../script/const.js"></script>
+</head>
+<body>
+<div id="app" class="reguit_page">
+
+    <!--头部标题-->
+    <div class="com_head blue" style="position: fixed; top: 0px;">
+        <div class="back_but" onclick="$A.change_frame('login')"></div>
+        <div class="title">註冊成為會員</div>
+    </div>
+
+    <div class="form" style="overflow-x: hidden;overflow-y: auto;top: 50px;">
+        <!-- <div class="item username">
+             <div class="icon"></div>
+             <input type="text" placeholder="6-18个字符,需要以字母开头">
+         </div>-->
+        <div class="item mobi">
+            <div class="icon"></div>
+            <input type="text" id="username" placeholder="輸入手機號碼">
+        </div>
+        <div class="item verify">
+            <div class="icon"></div>
+            <input type="text" id="verify" style="width: 150px" placeholder="圖片驗證碼">
+            <img id="verify_img" onclick="changeVerify()" width="80"
+                 height="37"
+                 style="display: inline-block; float: right; margin-right: 58px; margin-top: 5px;" alt="">
+        </div>
+        <div class="item verify">
+            <div class="icon"></div>
+            <input type="number" id="moble_verify" placeholder="輸入短信驗證碼">
+            <button class="but_1_2" id="send_sms_button" type="button" onclick="send_sms()">獲取驗證碼</button>
+        </div>
+        <div class="item password">
+            <div class="icon"></div>
+            <input type="password" id="password" placeholder="請設置登錄密碼">
+        </div>
+        <div class="item repassword">
+            <div class="icon"></div>
+            <input type="password" id="re_password" placeholder="請重復設置登錄密碼">
+        </div>
+        <div class="item invitation">
+            <div class="icon"></div>
+            <input type="text" id="invit" placeholder="邀請碼,沒有可以不填">
+        </div>
+
+        <div class="submit_outer">
+            <button class="but_1" type="button" id="submit_button" onclick="submit()">註&nbsp;&nbsp;&nbsp;&nbsp;冊
+            </button>
+            <!--<div class="agree_info">
+                <label for="agree">
+                    <input type="checkbox" id="agree"> 注册即同意本服务相关协议
+                </label>
+            </div>-->
+        </div>
+    </div>
+
+
+</div>
+
+</body>
+</html>
+<script type="text/javascript" src="../../script/lib/api.js"></script>
+<script type="text/javascript" src="../../script/lib/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="../../script/lib/base.js"></script>
+<script>
+    $(function () {
+        var submit_button = $('#submit_button')
+        var send_sms_button = $('#send_sms_button')
+        var verify_img = $('#verify_img')
+        var username = $('#username')
+        var password = $('#password')
+        var re_password = $('#re_password')
+        var verify = $('#verify')
+        var moble_verify = $('#moble_verify')
+        var invit = $('#invit')
+        var seconds = -1
+        var timer = setInterval(function () {
+            set_sms_seconds()
+            if (seconds > 0) {
+                seconds--
+            }
+        }, 1000)
+
+        function set_sms_seconds() {
+            if (seconds > 0) {
+                send_sms_button
+                    .attr('disabled', true)
+                    .html('剩余 ' + seconds + ' 秒重新發送')
+            } else {
+                send_sms_button
+                    .attr('disabled', false)
+                    .html('獲取驗證碼')
+            }
+        }
+
+        window.changeVerify = function () {
+            verify_img.attr('src', $A.domname + '/aapi/login/code?' + Math.random())
+            verify.val('')
+        }
+        changeVerify()
+
+        /**
+         * 发送手机验证码
+         */
+        window.send_sms = function () {
+            username.val($api.trimAll(username.val()))
+            if (username.val().length === 0) {
+                $A.toast('手機號碼必須')
+                return
+            }
+            if (verify.val().length !== 4) {
+                $A.toast('圖片驗證碼必須')
+                return
+            }
+            var params = {
+                moble: username.val(),
+                verify: verify.val()
+            }
+            $A.request('login/reg_send', params, function (data) {
+                if ($A.dev_model===0){
+                    $A.alert(data)
+                }
+                send_sms_button
+                    .attr('disabled', false)
+                seconds = 60
+                set_sms_seconds()
+            })
+        }
+
+
+        /**
+         * 注册
+         */
+        window.submit = function () {
+            username.val($api.trimAll(username.val()))
+            if (username.val().length === 0) {
+                $A.toast('用戶名-不能為空')
+                username.focus()
+                return false
+            }
+            if (password.val().length === 0) {
+                $A.toast('密碼-不能為空')
+                password.focus()
+                return false
+            }
+            if (re_password.val().length === 0) {
+                $A.toast('確認密碼-不能為空')
+                re_password.focus()
+                return false
+            } else {
+                if (re_password.val() !== password.val()) {
+                    $A.toast('確認密碼和原密碼不壹致')
+                    return
+                }
+            }
+            if (moble_verify.val().length !== 6) {
+                $A.toast('短信驗證碼-錯誤')
+                moble_verify.focus()
+                return false
+            }
+
+            // 执行请求
+            var params = {
+                moble: username.val(),
+                password: password.val(),
+                moble_verify: moble_verify.val(),
+                invit: invit.val(),
+            }
+            var fun = function (data) {
+                $A.alert('註冊成功!')
+                $A.change_frame('login')
+            }
+            $A.request('Login/reg', params, fun)
+        }
+
+
+        if ($A.dev_model === 0) {
+            username.val('13074614662')
+            password.val('aa123456')
+            re_password.val('aa123456')
+        }
+    })
+
+
+
+    setTimeout(function () {
+        $('.reguit_page').height(api.winHeight-Number($api.getStorage('StatusBarHeight')))
+        var curr_height =  Number($api.getStorage('StatusBarHeight')) + 30+$('.com_head').height()
+        $('.form').height(api.winHeight - curr_height)
+        $('.form').css({
+            'top':$('.com_head').height()+'px'
+        })
+    },1000)
+</script>

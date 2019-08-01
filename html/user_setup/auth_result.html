@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>身份信息认证-结果</title>
+    <link rel="stylesheet" type="text/css" href="../../css/base.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/custom.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/touchslider.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/coin.css"/>
+    <script src="../../script/const.js"></script>
+</head>
+<body>
+<div id="app" class="auth_submit_page auth_result_page">
+
+    <!--头部标题-->
+    <div class="com_head blue">
+        <div class="back_but" @click="back()"></div>
+        <div class="title">身份信息認證-結果</div>
+    </div>
+
+    <form action="">
+        <div class="item">
+            <div class="name">證件號碼:</div>
+            <div class="content" v-text="id_card">
+            </div>
+        </div>
+        <div class="item">
+            <div class="name">證件姓名:</div>
+            <div class="content"  v-text="true_name">
+            </div>
+        </div>
+    </form>
+
+
+    <div class="img_upload_item">
+        <div class="name">手持證件照:</div>
+        <div class="img_row">
+            <img v-if="idcardimg3.length>0" :src="idcardimg1+'?version='+Math.random()">
+        </div>
+    </div>
+    <div class="img_upload_item">
+        <div class="name">證件-正面:</div>
+        <div class="img_row">
+            <img v-if="idcardimg3.length>0" :src="idcardimg2+'?version='+Math.random()">
+        </div>
+    </div>
+    <div class="img_upload_item">
+        <div class="name">證件-反面:</div>
+        <div class="img_row">
+            <img v-if="idcardimg3.length>0" :src="idcardimg3+'?version='+Math.random()">
+        </div>
+    </div>
+
+
+    <div class="result_box">
+        <div class="item">
+            <div class="name">審核結果:</div>
+            <div class="info" v-text="idcardauth_arr[status]" :class="idcardauth_class_arr[status]">
+            </div>
+        </div>
+        <div class="item reason" v-show="status===2">
+            <div class="name">失敗原因:</div>
+            <div class="info" v-text="idcardinfo">
+
+            </div>
+        </div>
+        <div class="item re_submit" v-show="status===2">
+            <button class="but_3" @click="reset_status()">重新提交</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+
+<script type="text/javascript" src="../../script/lib/api.js"></script>
+<script type="text/javascript" src="../../script/lib/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="../../script/lib/base.js"></script>
+<script type="text/javascript" src="../../script/lib/vue.js"></script>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            true_name: "",
+            id_card: "",
+            status: 2,
+            idcardimg1: "",
+            idcardimg2: "",
+            idcardimg3: "",
+            idcardinfo: "手持照片不符合要求"
+        },
+        mounted: function () {
+            var $this=this
+            setTimeout(function () {
+                $this.get_data()
+            }, 600)
+        },
+        methods: {
+            // 获取数据
+            get_data: function () {
+                var $this = this
+                $A.request('user/card_info', {}, function (data) {
+                    //$A.alert(JSON.stringify(data))
+                    data.status=data.status-0
+                    $this.true_name = data.true_name
+                    $this.id_card = data.id_card
+                    $this.status = data.status
+                    $this.idcardimg1 = data.idcardimg1
+                    $this.idcardimg2 = data.idcardimg2
+                    $this.idcardimg3 = data.idcardimg3
+                    $this.idcardinfo = data.idcardinfo
+                    $api.setStorage('idcardauth', data.status)
+
+                })
+            },
+
+            // 重置状态
+            reset_status: function () {
+                $A.request('user/change_card_status', {}, function (data) {
+                    // 重置认证状态
+                    api.sendEvent({
+                        name: 'auth_info_submit',
+                        extra: {
+                            status: 0
+                        }
+                    });
+                    $api.setStorage('idcardauth', 0)
+                    $A.change_frame('user_setup_auth_submit')
+                })
+            },
+
+            // 返回
+            back:function () {
+                $A.change_frame($api.getStorage('from_page'))
+            }
+        }
+    })
+
+    $(function () {
+        $('.auth_result_page').css('minHeight', $A.get_body_height() + 'px')
+    })
+</script>

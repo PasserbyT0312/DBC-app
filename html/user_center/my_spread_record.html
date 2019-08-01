@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>ETH转出</title>
+    <link rel="stylesheet" type="text/css" href="../../css/base.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/custom.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/touchslider.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/coin.css"/>
+    <script src="../../script/const.js"></script>
+</head>
+<body>
+<div id="app" class="my_spread_list_page">
+
+    <!--头部标题-->
+    <div class="com_head">
+        <div class="back_but" onclick="$A.change_frame('user_center_my_spread')"></div>
+        <div class="title">推廣記錄</div>
+        <div class="right_box">
+        </div>
+    </div>
+
+
+    <div v-show="list.length>0" id="data_list" class="list" style="overflow: auto">
+        <div class="row head">
+            <div class="item">用戶</div>
+            <div class="item">註冊時間</div>
+            <div class="item">認證狀態</div>
+        </div>
+        <div class="row" v-for="(val,key) in list" :key="key" :class="{curr:key%2==0}">
+            <div class="item" v-text="val.username"></div>
+            <div class="item" v-text="$A.timestampToTime(val.addtime)"></div>
+            <div class="item info" v-text="val.idcardauth===1?'已認證':'未認證'" :class="'status_'+val.idcardauth"></div>
+        </div>
+    </div>
+
+    <div v-show="list.length==0" class="no_data">
+        <img src="../../images/no_data.png" alt="">
+        <p>暫無數據...</p>
+    </div>
+
+
+</div>
+
+</body>
+</html>
+
+<script type="text/javascript" src="../../script/lib/api.js"></script>
+<script type="text/javascript" src="../../script/lib/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="../../script/lib/base.js"></script>
+<script type="text/javascript" src="../../script/lib/vue.js"></script>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            list:[
+                // {
+                //     "id": "323",
+                //     "username": "Rucool1122",
+                //     "addtime": 1536204290,
+                //     "idcardauth": "1"
+                // },
+                // {
+                //     "id": "326",
+                //     "username": "coy9977123",
+                //     "addtime": 1534245811,
+                //     "idcardauth": "0"
+                // }
+            ]
+        },
+        mounted: function () {
+            var $this=this
+            setTimeout(function () {
+                $this.get_data()
+                // 监听属性
+                api.addEventListener({
+                    name: 'user_center_my_spread_record_reflush'
+                }, function(ret, err) {
+                    $this.get_data()
+                });
+
+
+
+                setTimeout(function () {
+                    var curr_height= $('.com_head').height()+Number($api.getStorage('StatusBarHeight'))
+                    $('#data_list').height(api.winHeight-curr_height)
+
+                    var page_height = (api.winHeight-Number($api.getStorage('StatusBarHeight')))
+                    $('.my_spread_list_page').height(page_height)
+                },600)
+            },600)
+
+        },
+        methods: {
+            // 获取列表信息
+            get_data:function () {
+                var $this=this
+                $A.request('user/shared_list',{},function (data) {
+                    $this.list=data
+                    $this.$forceUpdate()
+                })
+            }
+        }
+    })
+
+</script>

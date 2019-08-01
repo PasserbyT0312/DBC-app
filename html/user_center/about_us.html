@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>ETH转入-记录</title>
+    <link rel="stylesheet" type="text/css" href="../../css/base.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/custom.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/touchslider.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/coin.css"/>
+    <script src="../../script/const.js"></script>
+</head>
+<body>
+<div id="app" class="contact_us_page">
+
+    <!--头部标题-->
+    <div class="com_head">
+        <div class="back_but" onclick="$A.change_frame('user_center_index')"></div>
+        <div class="title">聯系我們</div>
+    </div>
+
+    <div class="con">
+        <div style="margin: 10px auto; width: 90%; line-height: 25px; font-size: 13px; overflow-y: auto;overflow-x: hidden" v-html="content"></div>
+    </div>
+
+</div>
+
+</body>
+</html>
+
+<script type="text/javascript" src="../../script/lib/api.js"></script>
+<script type="text/javascript" src="../../script/lib/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="../../script/lib/base.js"></script>
+<script type="text/javascript" src="../../script/lib/vue.js"></script>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            content:''
+        },
+        mounted: function () {
+            var $this=this
+            setTimeout(function () {
+                $this.get_data()
+                $('.con').height(api.winHeight-$('.com_head').height()-Number($api.getStorage('StatusBarHeight'))-10)
+            },600)
+        },
+        methods: {
+
+           get_data:function () {
+               var $this=this
+               $A.request('news/about',{},function (data) {
+                   $this.content=data
+                   $this.$forceUpdate()
+               })
+           }
+
+        }
+    })
+
+    $(function () {
+        $('.contact_us_page').css('minHeight',$A.get_body_height()+'px')
+    })
+</script>

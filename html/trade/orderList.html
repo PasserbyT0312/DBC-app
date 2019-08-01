@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>otc订单列表</title>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/base.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/touchslider.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/coin.css" />
+    <script src="../../script/const.js"></script>
+    <style>
+        html,body{
+            font-size: 16px;
+            background: #fff;
+        }
+
+        .com_head {
+            background: #fff;
+            font-size: 14px;
+        }
+
+        .aui-bar-nav .aui-btn .aui-iconfont {
+            color: #8F9EAB;
+            font-weight: bold;
+        }
+
+        .top {
+            background: #fff;
+            font-size: 20px;
+            color: #263E56;
+            padding: 0 15px 15px;
+        }
+
+        .gray {
+            color: #97A5B1;
+        }
+        .blue{
+          color: #273F57;
+        }
+        .orderStatus {
+            color: #4082CF;
+        }
+        .item{
+          padding: 15px;
+          border-bottom: 1px solid #F1F3F4;
+        }
+        .title{
+          font-size: 14px;
+          color: #D1D7DC;
+        }
+        .ordername{
+          font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <!--头部标题-->
+        <header id="pack" class="aui-bar aui-bar-nav com_head">
+            <a class="aui-pull-left aui-btn" tapmode onclick="closeFrame()">
+                <span class="aui-iconfont aui-icon-left"></span>
+            </a>
+        </header>
+        <div class="top b">
+            订单记录
+        </div>
+        <div class="orderList">
+            <div class="item" v-for="item in 10 ">
+                <div class="flex-box-between aui-margin-b-15">
+                    <div class="orderStatus">购买 <span class="blue">BTC</span></div>
+                    <div class="gray" @click="orderdetail">已取消 <span class="aui-iconfont aui-icon-right"></span></div>
+                </div>
+                <div class="aui-row title aui-margin-b-10">
+                  <div class="aui-col-xs-4">时间</div>
+                  <div class="aui-col-xs-4 tx-c">数量(BTC)</div>
+                  <div class="aui-col-xs-4 tx-r">交易总额(CNY)</div>
+                </div>
+                <div class="aui-row gray ordername aui-margin-b-10">
+                  <div class="aui-col-xs-4">14:22 08/17/2018</div>
+                  <div class="aui-col-xs-4 tx-c">0.010896</div>
+                  <div class="aui-col-xs-4 tx-r">500.00</div>
+                </div>
+                <div class="userName blue">刚进城的村长</div>
+            </div>
+        </div>
+</body>
+
+<script type="text/javascript" src="../../script/lib/api.js"></script>
+<script type="text/javascript" src="../../script/lib/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="../../script/lib/base.js"></script>
+<script type="text/javascript" src="../../script/lib/vue.js"></script>
+<script>
+    var app = new Vue({
+        el: "#app",
+        data: {
+        },
+        methods: {
+            orderdetail:function () {
+              api.openFrame({
+                  name: 'orderdetail',
+                  url: '../trade/orderdetail.html'
+              });
+            }
+        }
+    })
+</script>
+
+</html>

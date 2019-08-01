@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>ETH转入</title>
+    <link rel="stylesheet" type="text/css" href="../../css/base.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/custom.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/touchslider.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/coin.css"/>
+    <script src="../../script/const.js"></script>
+</head>
+<body>
+<div id="app" class="transfer_in_page">
+
+    <!--头部标题-->
+    <div class="com_head">
+        <div class="back_but" onclick="$A.change_frame($api.getStorage('from_page'))"></div>
+        <div class="title" v-text="coin_name+'转入'"></div>
+        <div class="right_box" onclick="$A.change_frame('user_center_transfer_in_record')">
+            轉入記錄
+        </div>
+    </div>
+
+    <div class="use_able_info">
+        <div class="left">可用資產</div>
+        <div class="right">
+            <span v-text="ToDouble(balance)"></span>
+            <span v-text="coin_name"></span>
+        </div>
+    </div>
+
+    <div class="qr_box" v-show="status===1">
+        <!--<img src="../../images/qr.png"/>-->
+        <div class="qr_img_box"></div>
+        <div class="text" v-text="wallet_address"></div>
+        <div class="button_box">
+            <button class="but_2" @click="$A.copy(wallet_address)">復制錢包地址</button>
+        </div>
+    </div>
+
+    <div v-if="status===0" style="background: #fdebe8; border: 1px solid indianred; width: 80%; margin: 20px auto; padding: 20px; font-size: 1.25rem;">
+        當前幣種,暫時禁止轉入
+    </div>
+
+
+    <div class="transfer_info">
+        <div class="outer">
+            <div class="title">轉入說明</div>
+            <div class="con">
+              <p>1.虛擬幣的轉入是自動入賬，網絡確認達到5個確認後自動入賬</p>
+              <p>2.該地址是您轉悠的轉入地址，可以同時進行多次充值</p>
+              <p>3.為了資金安全，我們可能隨時更換地址，請以最新的地址為準</p>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+</body>
+</html>
+
+<script type="text/javascript" src="../../script/lib/api.js"></script>
+<script type="text/javascript" src="../../script/lib/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="../../script/lib/jquery.qrcode.min.js"></script>
+<script type="text/javascript" src="../../script/lib/base.js"></script>
+<script type="text/javascript" src="../../script/lib/vue.js"></script>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            curr_coin: {
+                name: 'otc',
+                img: '../../images/coin_icon.png',
+            },
+            title: "以太坊",
+            coin_name: "eth",
+            status: 1,                //0=> 禁止        1=>开启
+            balance: 0,               //可用资产
+            wallet_address: "http://jetienne.com"    //
+        },
+        mounted: function () {
+            //jquery('#qrcode').qrcode("this plugin is great");
+            /*jQuery('.qr_img_box').qrcode({
+                text:"asdfasfaf",
+                width:200,
+                height:200,
+            });*/
+            var $this = this
+            setTimeout(function () {
+                $this.get_data()
+
+                // 监听属性
+                api.addEventListener({
+                    name: 'user_center_transfer_in_reflush'
+                }, function (ret, err) {
+                    $this.get_data()
+                });
+            }, 600)
+        },
+        methods: {
+
+            //获取数据
+            get_data: function () {
+                var $this = this
+                $this.curr_coin = $api.getStorage('choose_currency_coin')
+                //$A.alert('当期币种信息: '+JSON.stringify($this.curr_coin))
+                //$A.alert('参数：'+$this.curr_coin.name)
+                $A.request('finance/in_info', {
+                    coin: $this.curr_coin.name
+                }, function (data) {
+                    //$A.alert(JSON.stringify(data))
+                    data.status = Number(data.status)
+                    $this.title = data.title
+                    $this.coin_name = data.coin_name
+                    $this.status = data.status
+                    $this.balance = data.balance
+                    $this.wallet_address = data.wallet_address
+                    $this.$forceUpdate()
+                    if (data.status === 1) {
+                        $('.qr_img_box canvas').remove()
+                        $('.qr_img_box').qrcode({
+                            text: data.wallet_address ? data.wallet_address : '錢包地址丟失',
+                            width: 200,
+                            height: 200,
+                        });
+                    }
+                })
+            }
+
+        }
+    })
+
+    $(function () {
+        $('.transfer_in_page').css('minHeight', $A.get_body_height() + 'px')
+    })
+
+</script>

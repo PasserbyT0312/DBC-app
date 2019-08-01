@@ -1,0 +1,100 @@
+.coin {
+    background: url(img/coin_all_a.png) no-repeat top center, url(img/coin_all_a.png) no-repeat center;
+    background-size: 80% auto;
+}
+
+
+.coin_coin {
+    display: block;
+    width: 100px;
+    height: 100px;
+    float: left
+}
+
+.coin_30 {
+    -webkit-transform: scale(.3);
+    -moz-transform: scale(.3);
+    -ms-transform: scale(.3);
+    transform: scale(.3);
+    position: absolute;
+    top: -20px;
+    left: 6px
+}
+
+.coin_40 {
+    -webkit-transform: scale(.4);
+    -moz-transform: scale(.4);
+    -ms-transform: scale(.4);
+    transform: scale(.4)
+}
+
+.coin_19 {
+    -webkit-transform: scale(.19);
+    -moz-transform: scale(.19);
+    -ms-transform: scale(.19);
+    transform: scale(.19)
+}
+
+.coin_25 {
+    -webkit-transform: scale(.25);
+    -moz-transform: scale(.25);
+    -ms-transform: scale(.25);
+    transform: scale(.25)
+}
+
+
+.coin_eth {
+    background-position: 3px -597px, 0 100px
+}
+
+.coin_eos {
+    background-position: 3px -270px, 0 100px
+}
+
+.coin_xrp {
+    background-position: 3px -705px, 0 100px
+}
+
+.coin_ltc {
+    background-position: 3px -569px, 0 100px
+}
+
+/*b*/
+.coin_ela {
+    background: url(img/coin_all_b.png) no-repeat top center, url(img/coin_all_b.png) no-repeat center;
+    background-size: 80% auto;
+    background-position: 3px -1470px, 0 100px
+}
+
+.coin_bch {
+    background-position: 3px -542px, 0 100px
+}
+
+.coin_cnmc {
+    background: url(img/coin_all_b.png) no-repeat top center, url(img/coin_all_b.png) no-repeat center;
+    background-size: 80% auto;
+    background-position: 3px -1551px, 0 100px
+}
+
+.coin_musk {
+    background: url(img/coin_all_b.png) no-repeat top center, url(img/coin_all_b.png) no-repeat center;
+    background-size: 80% auto;
+    background-position: 3px -897px, 0 100px
+}
+
+.coin_fti {
+    background: url(img/coin_all_b.png) no-repeat top center, url(img/coin_all_b.png) no-repeat center;
+    background-size: 80% auto;
+    background-position: 3px -1443px, 0 100px
+}
+
+/*b*/
+.coin_ont {
+    background: url(img/coin_all_b.png) no-repeat top center, url(img/coin_all_b.png) no-repeat center;
+    background-size: 80% auto;
+    background-position: 3px -1278px, 0 100px
+}
+
+.coin_doge {
+    background-position: 3px -734px, 0 100px
+}

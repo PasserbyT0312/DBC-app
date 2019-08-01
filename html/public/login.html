@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>用户登录</title>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css"/>
+    <script src="../../script/const.js"></script>
+</head>
+<body>
+<div id="app">
+    <div class="login_page">
+        <!--头部标题-->
+        <div class="com_head blue">
+            <div class="back_but" onclick="$A.change_frame('index')"></div>
+            <div class="title">登錄</div>
+        </div>
+
+        <div class="logo">
+
+        </div>
+        <div class="form">
+            <ul class="aui-list aui-form-list">
+                <li class="aui-list-item">
+                    <div class="aui-list-item-inner">
+                        <div class="aui-list-item-label-icon">
+                            <i class="aui-iconfont aui-icon-mobile"></i>
+                        </div>
+                        <div class="aui-list-item-input">
+                            <input id="username" type="text" placeholder="請輸入用戶名">
+                        </div>
+                    </div>
+                </li>
+                <li class="aui-list-item">
+                    <div class="aui-list-item-inner">
+                        <div class="aui-list-item-label-icon">
+                            <i class="aui-iconfont aui-icon-lock"></i>
+                        </div>
+                        <div class="aui-list-item-input">
+                            <input id="password" type="password" placeholder="請輸入登陸密碼">
+                        </div><!-- <div class="aui-list-item-label-icon">-->
+                        <!--<i class="aui-iconfont aui-icon-display"></i>-->
+                        <!--</div>-->
+                    </div>
+                </li>
+                <li class="aui-list-item">
+                    <div class="aui-list-item-inner">
+                        <div class="aui-list-item-label-icon">
+                            <i class="aui-iconfont aui-icon-lock"></i>
+                        </div>
+                        <div class="aui-list-item-input">
+                            <input id="verify" type="number" placeholder="請輸入驗證碼">
+                        </div>
+                        <div class="aui-list-item-label-icon">
+                            <img id="verify_img" src="../../css/img/verify_img.png" onclick="changeVerify()"
+                                 style="height: 33px; width: 150px; border-radius: 5px; margin-top: 2px">
+                        </div>  <!-- <div class="aui-list-item-label-icon">-->
+                        <!--<i class="aui-iconfont aui-icon-display"></i>-->
+                        <!--</div>-->
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="submit_button_outer">
+            <button class="but_3" id="submit_button" onclick="submit()">登&nbsp;&nbsp;&nbsp;&nbsp;錄</button>
+        </div>
+
+        <div class="link_row">
+            <a href="javascript:void(0)" onclick="$A.change_frame('reguit')">註冊</a>
+            &nbsp;|&nbsp;
+            <a href="javascript:void(0)" onclick="$A.change_frame('find_password')">忘記密碼</a>
+        </div>
+
+        <div class="company_info">
+            NGMT Copyright@2018
+        </div>
+    </div>
+</div>
+</body>
+<link rel="stylesheet" href="../../css/login.css">
+</html>
+<script type="text/javascript" src="../../script/lib/api.js"></script>
+<script type="text/javascript" src="../../script/lib/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="../../script/lib/base.js"></script>
+<script>
+    $(function () {
+        var submit_button = $('#submit_button')
+        var verify_img = $('#verify_img')
+        var username = $('#username')
+        var password = $('#password')
+        var verify = $('#verify')
+
+        window.changeVerify = function () {
+            verify_img.attr('src', $A.domname + '/aapi/login/code?' + Math.random())
+            verify.val('')
+        }
+        changeVerify()
+
+
+        window.submit = function () {
+            username.val($api.trimAll(username.val()))
+            if (username.val().length === 0) {
+                $A.toast('用戶名-不能為空')
+                username.focus()
+                return false
+            }
+            if (password.val().length === 0) {
+                $A.toast('密碼-不能為空')
+                password.focus()
+                return false
+            }
+            if (verify.val().length !== 4) {
+                $A.toast('驗證碼-不能為空')
+                verify.focus()
+                return false
+            }
+
+            // 执行请求
+            var params = {
+                username:username.val(),
+                password:password.val(),
+                verify:verify.val()
+            }
+            $A.request('Login/login',params,function (data) {
+                if ($A.dev_model!==0){
+                    password.val('')
+                    verify.val('')
+                }
+                // 登录成功
+                //$A.set_token('token',data)
+                api.setPrefs({
+                    key: 'token',
+                    value: data
+                });
+                api.setPrefs({
+                    key: 'username',
+                    value: username.val()
+                });
+                api.sendEvent({
+                    name: 'user_center_index_reflush',
+                });
+                api.sendEvent({
+                    name: 'trade_index_reflush',
+                });
+                // 调回首页
+                $A.change_frame('index')
+
+                //alert(JSON.stringify(data))
+            })
+            // $A.request(,,)
+        }
+
+
+        if ($A.dev_model===0){
+            username.val('13074614662')
+            password.val('aa123456')
+        }
+    })
+</script>

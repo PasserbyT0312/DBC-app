@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>交易</title>
+    <link rel="stylesheet" type="text/css" href="../../css/base.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/custom.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/touchslider.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/coin.css"/>
+    <script src="../../script/const.js"></script>
+</head>
+<body>
+<div id="app" class="trade_page">
+    <!--头部区域-->
+    <div class="head_bar">
+        <div class="left_box" onclick="$A.choose_trade_pairs('trade')">
+            <img :src="curr_coin.img" class="coin_icon" onerror="this.src=image_load_error"/>
+            <div class="coin_name" v-text="curr_coin.name && curr_coin.name.replace('_','/')"></div>
+            <div class="arrow_down_icon"></div>
+        </div>
+        <div class="right_box">
+            <!--<span class="record_tag selected"></span>-->
+            <span class="chart_tag" onclick="$A.change_frame('trade_chart')"></span>
+        </div>
+    </div>
+
+    <div id="content">
+        <!--价格信息条-->
+        <div class="price_bar">
+            <div class="left_box">
+                <div class="tag1">
+                    <span v-text="curr_price"></span>
+                    <span v-text="curr_coin.name.split('_')[1]"></span>
+                </div>
+                <div class="tag2">≈ {{ToDouble(Fixed(reference_value*curr_price))}} {{ reference_name }}</div>
+            </div>
+            <div class="right_box" onclick="$A.choose_trade_pairs('entrust_list','trade_index')">
+                <span v-if="token.length>0" class="turn_tag" style="color: #1270df;font-size: 14px;">我的委托單</span>
+            </div>
+        </div>
+
+        <!--操作方式-->
+        <div class="act_type_bar">
+            <div class="item" :class="{curr:type===0}" @click="change_type(0)">
+                <div class="name">買入</div>
+            </div>
+            <div class="item" :class="{curr:type===1}" @click="change_type(1)">
+                <div class="name">賣出</div>
+            </div>
+        </div>
+
+        <!--交易数据-->
+        <div class="trade_box">
+            <!--交易-购买-数据-->
+            <div class="buy_box">
+                <div class="row head">
+                    <div class="con">
+                        <div class="nums_info">數量</div>
+                        <div class="price_info">賣價(<span v-text="curr_coin.name.split('_')[1]"></span>)</div>
+                    </div>
+                </div>
+
+                <div class="row" v-for="val in buy_arr">
+                    <div class="con" @click="form_price=val.price">
+                        <div class="nums_info" v-text="val.nums"></div>
+                        <div class="price_info" v-text="val.price"></div>
+                    </div>
+                    <div class="bg" :style="{width: val.ratio+'%'}"></div>
+
+                </div>
+
+            </div>
+
+
+            <!--交易-出售-数据-->
+            <div class="seller_box">
+                <div class="row head">
+                    <div class="con">
+                        <div class="price_info">買價(<span v-text="curr_coin.name.split('_')[1]"></span>)</div>
+                        <div class="nums_info">數量</div>
+                    </div>
+                </div>
+                <div class="row" v-for="val in sell_arr">
+                    <div class="con" @click="form_price=val.price">
+                        <div class="nums_info" style="text-align: left;text-indent: 5px;" v-text="val.price"></div>
+                        <div class="price_info" style="text-align: right" v-text="val.nums"></div>
+                    </div>
+                    <div class="bg" :style="{width: val.ratio+'%'}"></div>
+                </div>
+            </div>
+            <div class="c"></div>
+
+        </div>
+
+        <!--可用描述信息-->
+        <div class="use_able_info">
+            <div v-if="token.length>0">可用: <span class="red" v-text="ToDouble(this.get_money())"></span></div>
+        </div>
+
+        <!--单价-->
+        <div class="price_box">
+            <div class="input_outer">
+                <div class="tag1">
+                    <input type="number" v-model="form_price" placeholder="請輸入單價">
+                </div>
+                <div class="tag2" v-text="get_trade_coin_name(0)">
+
+                </div>
+                <div class="tag3">
+                    <button>-</button>
+                </div>
+                <div class="tag4">
+                    <button>+</button>
+                </div>
+            </div>
+            <div class="tip_info">
+
+                <span v-text="curr_price"></span>
+                <span v-text="get_trade_coin_name(0)"></span>
+            </div>
+        </div>
+
+        <!--数量-->
+        <div class="nums_box">
+            <div class="input_outer">
+                <div class="tag1">
+                    <input type="number" v-model="form_nums" placeholder="請輸入數量">
+                </div>
+                <div class="tag2" v-text="get_trade_coin_name(1)"></div>
+                <div class="tag3" @click="set_all()">全部</div>
+            </div>
+            <div class="tip_info">
+                交易額:
+                <span v-text="ToDouble(Fixed(form_price*form_nums))+' '+get_trade_coin_name(0)"></span>
+                ≈
+                <span v-text="ToDouble(Fixed(Fixed(form_price*form_nums)*reference_value))"></span>
+                <span v-text="reference_name"></span>
+            </div>
+        </div>
+
+        <!--交易-密码-->
+        <div class="password_box">
+            <input type="password" v-model="form_password" placeholder="請輸入交易密碼">
+        </div>
+
+        <div class="sure_button">
+            <button class="but_red" v-if="token.length==0" type="button" onclick="$A.change_frame('login')">登 錄</button>
+            <button type="button" v-if="token.length>0" @click="submit()" class="but_green">
+                <span v-text="type===0?'買入':'賣出'"></span>
+                -
+                <span v-text="curr_coin.name.split('_')[0]"></span>
+            </button>
+        </div>
+    </div>
+
+    <!--底部导航-->
+    <div id="footer">
+        <ul class="footer-nav">
+            <li class="index_page">
+                <div class="icon"></div>
+                <div class="name">首頁</div>
+            </li>
+            <li class="trade_page selected">
+                <div class="icon"></div>
+                <div class="name">交易</div>
+            </li>
+            <li class="otc_page">
+                <div class="icon"></div>
+                <div class="name">資產</div>
+            </li>
+            <li class="user_center_page">
+                <div class="icon"></div>
+                <div class="name">我的</div>
+            </li>
+        </ul>
+    </div>
+</div>
+
+</body>
+</html>
+
+<script type="text/javascript" src="../../script/lib/api.js"></script>
+<script type="text/javascript" src="../../script/lib/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="../../script/lib/base.js"></script>
+<script type="text/javascript" src="../../script/lib/vue.js"></script>
+<script>
+
+    var app = new Vue({
+        el: '#app',
+        data: {
+            curr_coin: {
+                title: '空',
+                name: 'none',
+                img: '',
+                reference_value: 0
+            },
+            curr_price: 0,
+            buy_price: 0,
+            sell_price: 0,
+            reference_value: 0,
+            buy_money: 0,
+            sell_money: 0,
+            buy_arr: [/*
+                {
+                    "id": "3496",
+                    "price": "0.06000000",
+                    "nums": "23.00000000",
+                    "ratio": "100%"
+                },
+                {
+                    "id": "3496",
+                    "price": "0.06000000",
+                    "nums": "23.00000000",
+                    "ratio": "100%"
+                },
+                {
+                    "id": "3496",
+                    "price": "0.06000000",
+                    "nums": "23.00000000",
+                    "ratio": "100%"
+                }*/
+            ],
+            sell_arr: [/*{
+                "id": "3499",
+                "price": "133.00000000",
+                "nums": "2.00000000",
+                "ratio": "100%"
+                },
+                {
+                    "id": "3498",
+                    "price": "300.00000000",
+                    "nums": "2.00000000",
+                    "ratio": "100%"
+                },
+                {
+                    "id": "3497",
+                    "price": "400.00000000",
+                    "nums": "1.00000000",
+                    "ratio": "50%"
+                }*/],
+            type: 0,
+            form_nums: 0,
+            form_price: 0,
+            form_password: '',
+            token: '',
+        },
+        mounted: function () {
+            var $this = this
+            setTimeout(function () {
+                var token = api.getPrefs({
+                    sync: true,
+                    key: 'token'
+                });
+                $this.token = token ? token : ''
+
+
+                var default_coin = $api.getStorage('choose_trade_pairs_data')
+                if (default_coin) {
+                    $this.curr_coin = default_coin
+                } else {
+                    $this.curr_coin = $A.get_trade_pairs_data()[0]
+                }
+
+                //$this.trade_pairs_data()
+                //$api.setStorage('choose_trade_pairs_data', null)
+                api.addEventListener({
+                    name: 'trade_index_change_coin'
+                }, function (ret, err) {
+                    $this.curr_coin = ret.value
+                    $this.trade_pairs_data()
+                    $this.$forceUpdate()
+                });
+
+
+                api.addEventListener({
+                    name: 'trade_index_reflush'
+                }, function (ret, err) {
+                    var token = api.getPrefs({
+                        sync: true,
+                        key: 'token'
+                    });
+                    $this.token = token ? token : ''
+                    $this.trade_pairs_data()
+                    $this.$forceUpdate()
+                });
+
+                setInterval(function () {
+                    //定时刷新
+                    $this.trade_pairs_data(true)
+                }, 30000)
+
+
+                $this.trade_pairs_data()
+
+
+                setTimeout(function () {
+                    // 底部导航高度
+                    var top = api.winHeight - $('#footer').height() - Number($api.getStorage('SafeAreaBottom'))
+                    $('#footer').css({
+                        top: top + 'px'
+                    })
+
+                    // 中间内容高度
+                    //$A.alert($A.getStatusHeight())
+                    var other_height = $('#footer').height() + $A.getSafeAreaBottomHeight()
+                    $('#content').height(api.winHeight - other_height - 40)
+                    $('#content').css({
+                        top: $('.head_bar').height() + 'px'
+                    })
+                }, 600)
+
+            }, 600)
+        },
+        methods: {
+            // 获取交易对信息
+            trade_pairs_data: function (no_change) {
+                var $this = this
+                var set_data = function (data) {
+                    //$A.alert(data)
+                    //$A.alert(JSON.stringify(data.sell))
+                    $this.curr_price = data.curr_price
+                    $this.buy_price = data.buy_price
+                    $this.sell_price = data.sell_price
+                    $this.buy_arr = data.buy
+                    $this.sell_arr = data.sell
+                    $this.reference_value = data.reference_value
+                    $this.buy_money = data.buy_money
+                    $this.sell_money = data.sell_money
+                    if (!no_change) {
+                        $this.change_type(0)
+                    }
+                    //$this.form_nums = $this.token
+                    $this.$forceUpdate()
+                }
+
+                var params = {
+                    market: $this.curr_coin.name,
+                    token: this.token
+                };
+
+                $A.request('market/info', params, set_data, set_data, null, true)
+            },
+            // 获取交易对列表信息
+            get_list: function () {
+                if (this.type === 0) {
+                    return this.buy_arr
+                } else {
+                    return this.sell_arr
+                }
+            },
+            // 获取交易对列表信息
+            get_trade_coin_name: function (type) {
+                if (typeof type === 'undefined') {
+                    type = this.type
+                }
+                if (type === 0) {
+                    return this.curr_coin.name.split('_')[1]
+                } else {
+                    return this.curr_coin.name.split('_')[0]
+                }
+            },
+            // 设置当前交易对类别
+            change_type: function (type) {
+                this.form_nums = ''
+                this.form_price = type === 0 ? this.buy_price : this.sell_price
+                this.form_password = ''
+                this.type = type
+            },
+            // 获取当前交易金额
+            get_cny_money: function () {
+                var price = Number(this.form_price)
+                var nums = Number(this.form_nums)
+                var money = 0
+                if (price > 0 && nums > 0) {
+                    money = (ToDouble(this.reference_value / this.curr_price) - 0) * this.form_nums
+                } else {
+                    return '0.00'
+                }
+                return ToDouble(money * this.form_price)
+            },
+            get_money: function () {
+                var money = this.type === 0 ? this.buy_money : this.sell_money
+                return ToDouble(money)
+            },
+            set_all: function () {
+                var money = this.type === 0 ? this.buy_money : this.sell_money
+                this.form_nums = money / this.form_price
+                // return ToDouble(money)
+            },
+            // 提交操作
+            submit: function () {
+                var price = Number(this.form_price)
+                var nums = Number(this.form_nums)
+                var $this=this
+                if (price <= 0) {
+                    $A.toast('單價錯誤')
+                    return
+                }
+                if (nums <= 0) {
+                    $A.toast('數量錯誤')
+                    return
+                }
+                var money = this.get_money()
+                var submit_money = Fixed(price * nums)
+                if (submit_money > money) {
+                    $A.toast('提交金額不能大於當前余額')
+                    return
+                }
+                if (this.form_password.length < 6) {
+                    $A.toast('交易密碼必須大於6位')
+                    return
+                }
+                var params = {
+                    type: this.type + 1,
+                    price: this.form_price,
+                    num: this.form_nums,
+                    market: this.curr_coin.name,
+                    pay_pwd: this.form_password,
+                }
+                $A.request('trade/submit', params, function () {
+                    $A.alert('發布成功')
+                    $this.trade_pairs_data()
+                })
+
+            }
+        }
+    })
+
+
+    $A.footer_event()
+
+</script>

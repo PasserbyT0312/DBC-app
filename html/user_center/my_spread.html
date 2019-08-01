@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>我的推广</title>
+    <link rel="stylesheet" type="text/css" href="../../css/base.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/custom.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/touchslider.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/coin.css"/>
+    <script src="../../script/const.js"></script>
+</head>
+<body>
+<div id="app" class="my_spread_page">
+
+    <!--头部标题-->
+    <div class="com_head">
+        <div class="back_but" onclick="$A.change_frame('user_center_index')"></div>
+        <div class="title">我的推廣</div>
+        <div class="right_box" @click="record()">
+            推廣記錄
+        </div>
+    </div>
+
+    <!--<div class="turn_bar">-->
+        <!--<div class="item curr">推广链接</div>-->
+        <!--<div class="item">推广记录</div>-->
+    <!--</div>-->
+
+    <div class="qr_box">
+        <div class="qr_img_box" style="padding: 10px; background: #FFF"></div>
+    </div>
+
+    <!--<div class="info_row">-->
+        <!--<div class="name">邀请码: </div>-->
+        <!--<div class="val" v-text="invit"></div>-->
+    <!--</div>-->
+    <!--<div class="info_row">-->
+        <!--<div class="name">邀请链接: </div>-->
+        <!--<div class="val" v-text="url">-->
+
+        <!--</div>-->
+    <!--</div>-->
+
+    <!--<div style="text-align: center">-->
+        <!--<div class="qr_img_box" style="width: 150px; margin: 10px auto; display: inline-block">-->
+
+        <!--</div>-->
+    <!--</div>-->
+
+    <div class="tip_row">
+        <div class="title">溫馨提示</div>
+        <div class="content">
+          <p>1.分享您的鏈接和二維碼給我的朋友</p>
+          <p>2.每個通過您的二維碼或者推廣鏈接註冊就會成為您的推廣用戶</p>
+          <p>3.每次推廣獎勵會實時到您的賬戶</p>
+          <p>4.每個賬號只能被壹個用戶推廣</p>
+        </div>
+    </div>
+
+    <div class="link_box">
+        <input type="text" readonly v-model="url" style="font-size: 1.0rem">
+    </div>
+
+    <div class="sub_row">
+        <button class="but_1" @click="$A.copy(url)">復制鏈接地址</button>
+    </div>
+
+</div>
+
+</body>
+</html>
+
+<script type="text/javascript" src="../../script/lib/api.js"></script>
+<script type="text/javascript" src="../../script/lib/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="../../script/lib/base.js"></script>
+<script type="text/javascript" src="../../script/lib/vue.js"></script>
+<script type="text/javascript" src="../../script/lib/jquery.qrcode.min.js"></script>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            invit: "",
+            url: "https://cli.im/text?84bcc77a960c"
+        },
+        mounted: function () {
+            var $this=this
+            setTimeout(function () {
+                $this.get_data()
+
+                // 监听属性
+                api.addEventListener({
+                    name: 'user_center_my_spread_reflush'
+                }, function(ret, err) {
+                    $this.get_data()
+                });
+            },600)
+        },
+        methods: {
+            get_data:function () {
+                var $this=this
+                $A.request('user/shared',{},function (data) {
+                    $this.invit=data.invit
+                    $this.url=data.url
+                    $('.qr_img_box canvas').remove()
+                    var qr_img_box=$('.qr_img_box')
+                    qr_img_box.qrcode({
+                        text: data.url ? data.url : '分享地址錯誤',
+                        width: qr_img_box.width(),
+                        height: qr_img_box.height(),
+                    });
+                    $this.$forceUpdate()
+                })
+            },
+            record:function () {
+                // 发送列表刷新事件
+                api.sendEvent({
+                    name: 'user_center_my_spread_record_reflush',
+                });
+                $A.change_frame('user_center_my_spread_record')
+            }
+        }
+    })
+
+    $(function () {
+        $('.my_spread_page').css('height',$A.get_body_height()+'px')
+    })
+</script>
