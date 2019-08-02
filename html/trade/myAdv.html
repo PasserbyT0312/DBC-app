@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 
@@ -5,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
     <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
-    <title>otc订单列表</title>
+    <title>otc我的广告</title>
     <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
     <link rel="stylesheet" type="text/css" href="../../css/base.css" />
     <link rel="stylesheet" type="text/css" href="../../css/custom.css" />
@@ -15,15 +16,26 @@
     <style>
         html,
         body {
-            font-size: 16px;
-            cursor: pointer;
+            /*font-size: 16px;*/
             background: #fff;
+            cursor: pointer;
         }
 
+        /*.com_head {
+            background: #fff;
+            font-size: 14px;
+        }*/
 
         .aui-bar-nav .aui-btn .aui-iconfont {
             color: #8F9EAB;
             font-weight: bold;
+        }
+
+        .top {
+            background: #fff;
+            font-size: 20px;
+            color: #263E56;
+            padding: 0 15px 15px;
         }
 
         .orderList {
@@ -65,39 +77,53 @@
             padding: 5px 0;
             font-size: 14px;
         }
+        .time{
+          font-size: 14px;
+        }
     </style>
 </head>
 
 <body>
     <div id="app">
+        <!--头部标题-->
+        <!-- <header id="pack" class="aui-bar aui-bar-nav com_head">
+            <a class="aui-pull-left aui-btn" tapmode onclick="$A.closeWin('trade/myAdv')">
+                <span class="aui-iconfont aui-icon-left"></span>
+            </a>
+        </header>
+        <div class="top b">
+            我的广告
+        </div> -->
         <header id="pack" class="aui-bar aui-bar-nav com_head">
-            <div class="back_but" tapmode onclick="closeFrame()"></div>
-              <div class="aui-title">订单记录</div>
+            <div class="back_but" tapmode onclick="$A.closeWin('trade/myAdv')"></div>
+              <div class="aui-title">我的广告</div>
         </header>
         <div id="orderList" class="orderList" style="overflow: auto">
-            <div class="item" v-for="item in orderList" @click="orderdetail(item)">
+            <div class="item" v-for="item in orderList">
                 <div class="flex-box-between aui-margin-b-15">
-                    <div class="orderStatus">{{saleStatus[item.sale]}} <span class="blue">{{item.coin}}</span></div>
-                    <div class="gray">{{orderStatus[item.status]}} <span class="aui-iconfont aui-icon-right"></span></div>
+                    <div class="orderStatus blue">{{item.coin}}</div>
+                    <div class="blue">{{orderStatus[item.status]}} <span class="aui-iconfont aui-icon-right"></span></div>
                 </div>
-                <div class="aui-row title aui-margin-b-10">
-                    <div class="aui-col-xs-4">时间</div>
-                    <div class="aui-col-xs-4 tx-c">数量(BTC)</div>
-                    <div class="aui-col-xs-4 tx-r">交易总额(CNY)</div>
+                <div class="aui-row ordername aui-margin-b-10">
+                    <div class="aui-col-xs-4">总数量(BTC)</div>
+                    <div class="aui-col-xs-4 tx-c">已售数量(BTC)</div>
+                    <div class="aui-col-xs-4 tx-r">单价(CNY)</div>
                 </div>
-                <div class="aui-row gray ordername aui-margin-b-10">
-                    <div class="aui-col-xs-4">{{item.time}}</div>
+                <div class="aui-row ordername  aui-margin-b-10">
+                    <div class="aui-col-xs-4">{{item.num}}</div>
                     <div class="aui-col-xs-4 tx-c">{{item.num}}</div>
                     <div class="aui-col-xs-4 tx-r">{{item.price}}</div>
                 </div>
-                <div class="blue userName">{{item.username}}</div>
+                <div class="flex-box-between">
+                    <div class="time gray">{{item.time}}</div>
+                    <div v-if="item.status==1" class="undoOrder" @click="undoOrder">撤销</div>
+                </div>
             </div>
             <div v-show="orderList.length==0" class="no_data">
                 <img src="../../images/no_data.png" alt="">
                   <p>暫無數據...</p>
             </div>
         </div>
-
 </body>
 
 <script type="text/javascript" src="../../script/lib/api.js"></script>
@@ -108,11 +134,10 @@
     var app = new Vue({
             el: "#app",
             data: {
-                orderStatus: ['待付款', '待确认', '已取消', '已完成', '挂卖中'],
-                saleStatus: ['购买', '出售'],
+                orderStatus: ['已撤销', '挂卖中'],
                 orderList: [{
                     id: 1,
-                    status: 0,
+                    status: 1,
                     sale: 0,
                     coin: 'BTC',
                     time: '14:22 08/17/2018',
@@ -152,48 +177,9 @@
                         num: 0.010896,
                         price: 500.00,
                         username: '刚进城的村长'
-                    }, {
-                        id: 3,
-                        status: 2,
-                        sale: 0,
-                        coin: 'BTC',
-                        time: '14:22 08/17/2018',
-                        num: 0.010896,
-                        price: 500.00,
-                        username: '刚进城的村长'
-                    }, {
-                        id: 4,
-                        status: 3,
-                        sale: 0,
-                        coin: 'BTC',
-                        time: '14:22 08/17/2018',
-                        num: 0.010896,
-                        price: 500.00,
-                        username: '刚进城的村长'
-                    }, {
-                        id: 5,
-                        status: 3,
-                        sale: 1,
-                        coin: 'BTC',
-                        time: '14:22 08/17/2018',
-                        num: 0.010896,
-                        price: 500.00,
-                        username: '刚进城的村长'
                     }]
                     this.orderList = this.orderList.concat(arr);
                     // console.log(this.orderList);
-                },
-                orderdetail: function(oid) {
-                    if (oid.status != 4) {
-                        api.openFrame({
-                            name: 'orderdetail',
-                            url: '../trade/orderdetail.html',
-                            pageParam: {
-                                orderId: oid
-                            }
-                        });
-                    }
-
                 },
                 undoOrder: function() {
                     api.confirm({
@@ -213,7 +199,7 @@
     function set_scroll_div() {
         var ID = 'orderList'
             // 设置列表高度
-        var curr_height =  $('.com_head').height() + Number($api.getStorage('StatusBarHeight')) - 20
+        var curr_height = $('.com_head').height() + Number($api.getStorage('StatusBarHeight')) - 20
         // console.log($('.top').height());
         //   console.log($('.com_head').height());
         //     console.log(Number($api.getStorage('StatusBarHeight')));

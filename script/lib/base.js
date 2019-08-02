@@ -1213,6 +1213,13 @@ $A.frames = [
       url: '../trade/orderList.html',
       is_reload: true,
       historyGestureEnabled: true,
+    },
+    {
+      //otc我的广告
+      name: 'myAdv',
+      url: '../trade/myAdv.html',
+      is_reload: true,
+      historyGestureEnabled: true,
     }
 ]
 

@@ -656,5 +656,5 @@
 
 
 .no_data{ font-size: 1.25rem; color: #666;  width: 70%; margin: 5% auto; text-align: center; padding-top: 5%}
-.no_data img{ width: 60%}
+.no_data img{ width: 60%;margin: auto;}
 .no_data p{ margin-top: 20px;}

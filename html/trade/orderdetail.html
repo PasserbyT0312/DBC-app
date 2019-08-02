@@ -27,7 +27,12 @@
             color: #fff;
             padding: 0 15px 15px;
         }
-
+        .statusIcon{
+          width: 25px;
+          height: 25px;
+          display: inline-block;
+          margin-right: 10px;
+        }
         .orderNum {
             padding: 15px;
             background: #fff;
@@ -145,8 +150,12 @@
         <header id="pack" class="aui-bar aui-bar-nav com_head">
             <div class="back_but" tapmode onclick="closeFrame()"></div>
         </header>
-        <div class="top">
-            {{orderStatus[status]}}
+        <div class="top flex-center">
+            <img v-if="detail.status==0||detail.status==1" src="../../css/img/wait.png" alt="" class="statusIcon">
+            <img v-else-if="detail.status==3" src="../../css/img/success.png" alt="" class="statusIcon">
+            <img v-else-if="detail.status==4" src="../../css/img/sale.png" alt="" class="statusIcon">
+            <img v-else src="../../css/img/cancel.png" alt="" class="statusIcon">
+            {{orderStatus[detail.status]}}
         </div>
         <div class="orderNum">
             <div class="total">¥ 2300.00 <img src="../../css/img/copy.png" alt="" class="copyBtn" @click="$A.copy(1111111)"></div>
@@ -154,7 +163,7 @@
             <div class="title"><label>数量</label>1.561227 ETH</div>
         </div>
         <div class="payBox">
-            <div v-show="status==0" class="aui-content aui-margin-b-15">
+            <div v-show="detail.status==0||detail.status==1||detail.status==3" class="aui-content aui-margin-b-15">
                 <ul class="aui-list aui-list-in">
                     <li class="aui-list-item aui-list-item-middle">
                         <div class="aui-list-item-inner aui-list-item-arrow">
@@ -163,7 +172,7 @@
                     </li>
                     <li class="aui-list-item">
                         <div class="aui-list-item-inner">
-                            <div class="aui-list-item-title">收款人</div>
+                            <div class="aui-list-item-title">{{detail.sale==0?'收':'付'}}款人</div>
                             <div class="aui-list-item-right">程家明 <img src="../../css/img/copy.png" alt="" class="copyBtn"></div>
                         </div>
                     </li>
@@ -179,7 +188,7 @@
                             <div class="aui-list-item-right">13069477367 <img src="../../css/img/copy.png" alt="" class="copyBtn"></div>
                         </div>
                     </li>
-                    <li class="aui-list-item">
+                    <li v-show="detail.status==0&&detail.sale==0" class="aui-list-item">
                         <div class="aui-list-item-inner">
                             <div class="aui-list-item-title" style="color:#1F3F59;">请使用本人（*志伟）支付宝向以上账号自行转账</div>
                         </div>
@@ -192,13 +201,13 @@
                 <ul class="aui-list aui-list-in">
                     <li class="aui-list-item">
                         <div class="aui-list-item-inner">
-                            <div class="aui-list-item-title">卖家昵称</div>
+                            <div class="aui-list-item-title">{{detail.sale==0?'卖':'买'}}家昵称</div>
                             <div class="aui-list-item-right">这是一个昵称</div>
                         </div>
                     </li>
                     <li class="aui-list-item">
                         <div class="aui-list-item-inner">
-                            <div class="aui-list-item-title">卖家实名</div>
+                            <div class="aui-list-item-title">{{detail.sale==0?'卖':'买'}}家实名</div>
                             <div class="aui-list-item-right">陈伟志 <img src="../../css/img/copy.png" alt="" class="copyBtn"></div>
                         </div>
                     </li>
@@ -223,11 +232,20 @@
                 </ul>
             </div>
         </div>
-        <div v-show="status==0" class="btn_row flex-box-between">
-            <div class="cancel" @click="cancelOrder">取消订单</div>
+        <!-- 待付款 -->
+        <div v-show="detail.status==0&&detail.sale==0" class="btn_row flex-box-between">
+            <div class="cancel" @click="cancelBuyOrder">取消订单</div>
             <div class="paySuccess">我已付款成功</div>
         </div>
-
+        <!-- 待确认 -->
+        <div v-show="detail.status==1&&detail.sale==1" class="btn_row flex-box-between">
+            <div class="cancel" @click="cancelSaleOrder">取消订单</div>
+            <div class="paySuccess">我已收款成功</div>
+        </div>
+        <!-- 挂卖中 -->
+        <div v-show="detail.status==4&&detail.sale==1" class="btn_row">
+            <div class="cancel" @click="undoOrder" style="width:100%;">撤销</div>
+        </div>
         <!-- 遮罩层-->
         <div v-show="isShow" class="codePop">
           <img src="../../css/img/1.png" alt="" class="codeImg">
@@ -241,50 +259,79 @@
 <script type="text/javascript" src="../../script/lib/base.js"></script>
 <script type="text/javascript" src="../../script/lib/vue.js"></script>
 <script>
-    var app = new Vue({
-        el: "#app",
-        data: {
-          status:0,
-          isShow:false,
-          orderStatus:['请付款','已取消','已完成']
-        },
-        methods: {
-            cancelOrder:function () {
-              api.confirm({
-                  title: '确认取消交易',
-                  msg: '如果您已经向卖家付款，请千万不要取消交易',
-                  buttons: ['確定', '取消']
-              }, function (ret, err) {
-                  if (ret.buttonIndex === 2) {
-                      return;
-                  }
-                  api.closeFrame({});
+apiready = function() {
+  // console.log(api.pageParam.orderId);
+  var app = new Vue({
+      el: "#app",
+      data: {
+        status:0,
+        isShow:false,
+        orderStatus:['待付款','待确认','已取消','已完成','挂卖中'],
+        detail:api.pageParam.orderId
+      },
+      methods: {
+          cancelBuyOrder:function () {
+            api.confirm({
+                title: '确认取消交易',
+                msg: '如果您已经向卖家付款，请千万不要取消交易',
+                buttons: ['確定', '取消']
+            }, function (ret, err) {
+                if (ret.buttonIndex === 2) {
+                    return;
+                }
+                api.closeFrame({});
+            })
+          },
+          cancelSaleOrder:function () {
+            api.confirm({
+                title: '确认取消交易',
+                msg: '如果您已经收到买家付款，请千万不要取消交易',
+                buttons: ['確定', '取消']
+            }, function (ret, err) {
+                if (ret.buttonIndex === 2) {
+                    return;
+                }
+                api.closeFrame({});
+            })
+          },
+          undoOrder:function () {
+            api.confirm({
+                title: '撤销广告',
+                msg: '您确认要进行该操作么？',
+                buttons: ['確定', '取消']
+            }, function (ret, err) {
+                if (ret.buttonIndex === 2) {
+                    return;
+                }
+                api.closeFrame({});
+            })
+          },
+          showCode:function () {
+            $('html,body').addClass('overhide'); //使网页不可滚动
+            this.isShow = true;
+            $A.mask();
+          },
+          closeCode:function () {
+            $('html,body').removeClass('overhide'); //使网页不可滚动
+            this.isShow = false;
+            $A.mask(false);
+          },
+          saveImg:function () {
+            api.saveMediaToAlbum({
+                path: 'http://module.apicloud.com/icon/1492678073326_IMG_1345.PNG'
+            }, function(ret, err) {
+                if (ret && ret.status) {
+                    alert('保存成功');
+                } else {
+                    alert('请允许DBC访问您的相册权限');
+                }
+            });
+          }
+      }
+  })
+}
 
-              })
-            },
-            showCode:function () {
-              $('html,body').addClass('overhide'); //使网页不可滚动
-              this.isShow = true;
-              $A.mask();
-            },
-            closeCode:function () {
-              $('html,body').removeClass('overhide'); //使网页不可滚动
-              this.isShow = false;
-              $A.mask(false);
-            },
-            saveImg:function () {
-              api.saveMediaToAlbum({
-                  path: 'http://module.apicloud.com/icon/1492678073326_IMG_1345.PNG'
-              }, function(ret, err) {
-                  if (ret && ret.status) {
-                      alert('保存成功');
-                  } else {
-                      alert('请允许DBC访问您的相册权限');
-                  }
-              });
-            }
-        }
-    })
+
 </script>
 
 </html>

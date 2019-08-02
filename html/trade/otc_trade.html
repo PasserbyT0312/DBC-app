@@ -6,6 +6,7 @@
     <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
     <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
     <title>otc交易界面</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css" />
     <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
     <link rel="stylesheet" type="text/css" href="../../css/base.css" />
     <link rel="stylesheet" type="text/css" href="../../css/custom.css" />
@@ -13,14 +14,20 @@
     <link rel="stylesheet" type="text/css" href="../../css/coin.css" />
     <script src="../../script/const.js"></script>
     <style>
-    html,body{
-        font-size: 16px;
-        background: #fff;
-    }
-        .com_head{
-          position: fixed;
-          top: 0;
+        html,
+        body {
+            font-size: 16px;
+            background: #fff;
         }
+        /*.aui-bar-nav .aui-pull-right{
+          height: 50px;
+        }*/
+
+        .com_head {
+            /*position: fixed;
+            top: 0;*/
+        }
+
         .com_head>.title {
             font-size: 14px;
         }
@@ -30,7 +37,7 @@
         }
 
         .title span {
-            width: 30px;
+            /*width: 30px;*/
             padding: 0 5px;
             -webkit-transition: all 300ms linear;
             -moz-transition: all 300ms linear;
@@ -48,10 +55,10 @@
             color: #8F9EAB;
             font-size: 14px;
             padding: 0 10px;
-            position: fixed;
-            top:50px;
+            /*position: fixed;
+            top: 50px;
             left: 0;
-            width: 100%;
+            width: 100%;*/
         }
 
         .item_coin {
@@ -64,9 +71,11 @@
             color: #3F81CE;
             border-bottom: 2px solid #3F81CE;
         }
-        .coin_list{
-          padding-top: 90px;
-        }
+
+        /*.coin_list {
+            padding-top: 90px;
+        }*/
+
         .coin_list .item {
             padding: 20px;
             background: #fff;
@@ -113,6 +122,83 @@
             padding: 5px 0;
             font-size: 14px;
         }
+        /*卖*/
+
+        .sale_box {
+            padding: 20px 15px 10px;
+        }
+
+        .choose_coin>.item {
+            width: 33.333%;
+            margin-top: 10px;
+            display: flex;
+            float: left;
+            height: 35px;
+            line-height: 35px;
+        }
+
+        .choose_coin>.item>.con {
+            width: 90%;
+            margin: 0px auto;
+            padding-left: 5px;
+            color: #8F9EAB;
+            border-radius: 5px;
+            border: 1px solid #8F9EAB;
+        }
+
+        .choose_coin>.item>.con.active {
+            border-color: #3D80CE;
+            color: #3D80CE;
+        }
+
+        .choose_coin>.item>.con>img {
+            width: 25px;
+            height: 25px;
+            position: relative;
+            top: 5px;
+            display: inline-block;
+        }
+
+        .choose_coin>.item>.con>span {
+            position: relative;
+            top: -3px;
+            left: 5px;
+        }
+
+        .input-row {
+            border: 1px solid #DCE1E5;
+            padding: 3px 10px;
+            margin-bottom: 10px;
+            border-radius: 0.25rem;
+        }
+
+        .input-row input {
+            padding-right: 5px;
+            font-size: 14px;
+        }
+
+        .input-row .coinName {
+            padding: 2px 0 2px 10px;
+            border-left: 1px solid #EAEDF0;
+            margin-left: 10px;
+        }
+
+        .clickOrder {
+            background: #3D80CE;
+            width: 90%;
+            color: #fff;
+            height: 2.2rem;
+            font-size: 16px;
+        }
+
+        .clickOrder:disabled {
+            background: #C7CED4;
+        }
+
+        .myadv {
+            font-size: 14px;
+            margin-top: 25px;
+        }
     </style>
 </head>
 
@@ -127,38 +213,66 @@
             </div>
             <span class="aui-pull-right aui-iconfont aui-icon-cert" @click="orderList()" style="font-size:22px;"></span>
         </header>
+
         <div v-show="cur==0">
             <div class="coin_type">
-                <div class="item_coin" :class="{'active':coinType==0}" @click="change_coin(0)">ETH</div>
-                <div class="item_coin" :class="{'active':coinType==1}" @click="change_coin(1)">BTC</div>
-                <div class="item_coin" :class="{'active':coinType==2}" @click="change_coin(2)">DBC</div>
+                <div class="item_coin b" :class="{'active':coinType==0}" @click="change_coin(0)">ETH</div>
+                <div class="item_coin b" :class="{'active':coinType==1}" @click="change_coin(1)">BTC</div>
+                <div class="item_coin b" :class="{'active':coinType==2}" @click="change_coin(2)">DBC</div>
             </div>
-            <div class="coin_list">
-                <div class="item" v-for="item in 10">
-                    <div class="top flex-box-between">
-                        <div class="b"><img src="../../images/user.png" alt="" class="userImg">长大抢小米</div>
-                        <div class="gray">16783 | 99%</div>
-                    </div>
-                    <div class="middle flex-box-between">
-                        <div class="gray">
-                            <div>数量 0.133005 BTC</div>
-                            <div>限额 ¥1000.00 - ¥4661.00</div>
+            <div id="otcList" style="overflow: auto">
+                <div class="coin_list">
+                    <div class="item" v-for="item in 10">
+                        <div class="top flex-box-between">
+                            <div class="b"><img src="../../images/user.png" alt="" class="userImg">长大抢小米</div>
+                            <div class="gray">16783 | 99%</div>
                         </div>
-                        <div class="gray tx-r">
-                            <div>单价</div>
-                            <div class="bigSize">¥69206.00</div>
+                        <div class="middle flex-box-between">
+                            <div class="gray">
+                                <div>数量 0.133005 BTC</div>
+                                <div>限额 ¥1000.00 - ¥4661.00</div>
+                            </div>
+                            <div class="gray tx-r">
+                                <div>单价</div>
+                                <div class="bigSize">¥69206.00</div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="last flex-box-between">
-                        <div><img src="../../css/img/wx.png" alt="" class="payIcon"><img src="../../css/img/yhcard.png" alt="" class="payIcon"><img src="../../css/img/alipay.png" alt="" class="payIcon"></div>
-                        <div class="buyCoin" @click="buyCoin">购买</div>
+                        <div class="last flex-box-between">
+                            <div><img src="../../css/img/wx.png" alt="" class="payIcon"><img src="../../css/img/yhcard.png" alt="" class="payIcon"><img src="../../css/img/alipay.png" alt="" class="payIcon"></div>
+                            <div class="buyCoin" @click="buyCoin">购买</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div v-show="cur==1">
+        <div v-show="cur==1" class="sale_box">
+            <div class="choose_coin margin-b-15">
+                <div class="item" v-for="(item,index) in coninList">
+                    <div class="con" :class="{'active':coinId==index}" @click="chooseCoin(index,item.name)">
+                        <img :src="item.img" onerror="this.src=image_load_error">
+                        <span v-text="item.name"></span>
+                    </div>
+                </div>
+                <div class="c"></div>
+            </div>
+            <div class="input-row flex-box-center">
+                <input type="number" v-model="price" placeholder="请输入单价" class="flex-con">
+                <div class="blue coinName">CNY</div>
+            </div>
+            <div class="input-row flex-box-center">
+                <input type="number" v-model="num" placeholder="请输入数量" class="flex-con">
+                <div class="blue coinName">{{coinName}}</div>
+            </div>
+            <div class="input-row">
+                <input type="password" v-model="pwd" placeholder="请输入交易密码" class="flex-con">
+            </div>
+            <div class="tx-c  margin-b-10  margin-t-15">
+                <button class="aui-btn clickOrder" type="button" :disabled="num==''||price==''||pwd==''">卖出</button>
+            </div>
 
+            <div class="tx-c myadv blue" onclick="$A.openWin('trade/myAdv')">我的广告</div>
         </div>
+
     </div>
 </body>
 
@@ -171,9 +285,32 @@
             el: "#app",
             data: {
                 cur: 0,
-                coinType: 0
+                coinType: 0,
+                coninList: [],
+                coinId: 0,
+                price: '',
+                num: '',
+                pwd: '',
+                coinName: ''
+            },
+            mounted: function() {
+                var $this = this;
+                setTimeout(function() {
+                    $this.get_data()
+                    set_scroll_div();
+                }, 600)
             },
             methods: {
+                // 请求拉取数据
+                get_data: function() {
+                    var $this = this;
+                    var set_data = function(data) {
+                        $this.coninList = data;
+                        $this.coinName = data[0].name;
+                        // $this.$forceUpdate()
+                    }
+                    $A.request('finance/coin_list', {}, set_data, set_data)
+                },
                 change_type: function(type) {
                     this.cur = type;
                 },
@@ -199,15 +336,37 @@
                         bgColor: 'rgba(43,43,43,0.5)'
                     });
                 },
-                orderList:function() {
-                  api.openFrame({
-                      name: 'orderList',
-                      url: '../trade/orderList.html'
-                  });
+                orderList: function() {
+                    api.openFrame({
+                        name: 'orderList',
+                        url: '../trade/orderList.html'
+                    });
+                },
+                chooseCoin: function(ids, name) {
+                    this.coinId = ids;
+                    this.coinName = name;
                 }
             }
         })
-
+        // 设置滚到div标签
+    function set_scroll_div() {
+        var ID = 'otcList'
+            // 设置列表高度
+        var curr_height = $('.coin_type').height() + $('.com_head').height() + Number($api.getStorage('StatusBarHeight')) - 20
+            // console.log($('.top').height());
+            //   console.log($('.com_head').height());
+            //     console.log(Number($api.getStorage('StatusBarHeight')));
+        $('#' + ID).height(api.winHeight - curr_height)
+        document.getElementById(ID).onscroll = function() {
+            var scrollHeight = document.getElementById(ID).scrollHeight;
+            var scrollTop = document.getElementById(ID).scrollTop;
+            var clientHeight = document.getElementById(ID).clientHeight;
+            if (scrollHeight - clientHeight === scrollTop) {
+                //滚动条滚到最底部
+                // app.getData()
+            }
+        };
+    }
 </script>
 
 </html>

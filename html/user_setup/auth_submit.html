@@ -43,14 +43,14 @@
     </form>
 
 
-    <div class="img_upload_item">
+  <!--  <div class="img_upload_item">
           <div class="name">手持證件照:</div>
         <div class="img_row">
             <img :src="idcardimg1?idcardimg1_local:'../../images/upload_img.png'">
             <button class="but_1_1" @click="choose_by_album(1)">上傳圖片</button>
-            <!--<input type="text" v-model="idcardimg1">-->
+            <input type="text" v-model="idcardimg1">
         </div>
-    </div>
+    </div>-->
     <div class="img_upload_item">
         <div class="name">證件-正面:</div>
         <div class="img_row">
@@ -136,10 +136,10 @@
                     $A.toast('【證件-真實姓名】錯誤')
                     return
                 }
-                if (this.idcardimg1.length === 0) {
-                    $A.toast('【手持證件照】-未選擇')
-                    return
-                }
+                // if (this.idcardimg1.length === 0) {
+                //     $A.toast('【手持證件照】-未選擇')
+                //     return
+                // }
                 if (this.idcardimg2.length === 0) {
                     $A.toast('【證件-正面】-未選擇')
                     return

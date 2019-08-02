@@ -81,14 +81,26 @@ button.but_3{ color: #FFF; background: #d81e06; border-radius: 5px; padding: 3px
     display: -webkit-flex;
     display: flex;
 }
+.flex-center{
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  align-items: center;
+}
 .margin-b-10{
   margin-bottom: 10px;
+}
+.margin-b-15{
+  margin-bottom: 15px;
 }
 .margin-b-rem{
   margin-bottom: 1rem;
 }
 .margin-t-10{
   margin-top: 10px;
+}
+.margin-t-15{
+  margin-top: 15px;
 }
 .flex-con {
     -webkit-box-flex: 1;
