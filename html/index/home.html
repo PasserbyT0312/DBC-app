@@ -22,7 +22,10 @@
 
         </div>
     </div>
-
+    <!-- <div class="item" onclick="$A.openWin('trade/otc_trade')">
+        <img src="../../css/img/c2c.png" alt="">
+        <div class="name">C2C交易</div>
+    </div> -->
     <!--<div class="slider_tag" style="display: none;">
         <div class="touchslider-viewport">
             <div style="width:10000px">
@@ -84,6 +87,7 @@
         <!--</div>-->
         <div class="item">
             <div style="flex: 1;border-right: 1px solid #EEE;" @click="jumpElse()">
+            <!-- <div style="flex: 1;border-right: 1px solid #EEE;" @click="$A.openWin('trade/otc_trade')"> -->
                 <div class="info-box">
                     <div class="title">Token果园</div>
                     <div class="sub_title">產出12%的DBC</div>
@@ -456,6 +460,10 @@
                       browser.open({
                           url: data
                       });
+                      // api.openApp({
+                      //   androidPkg: 'android.intent.action.VIEW' ,
+                      //   uri:data
+                      // });
                     }
                   });
               })

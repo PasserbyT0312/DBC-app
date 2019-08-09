@@ -71,7 +71,6 @@
             color: #3F81CE;
             border-bottom: 2px solid #3F81CE;
         }
-
         /*.coin_list {
             padding-top: 90px;
         }*/
@@ -125,7 +124,7 @@
         /*卖*/
 
         .sale_box {
-            padding: 20px 15px 10px;
+            padding: 0 15px 10px;
         }
 
         .choose_coin>.item {
@@ -139,7 +138,7 @@
 
         .choose_coin>.item>.con {
             width: 90%;
-            margin: 0px auto;
+            /*margin: 0px auto;*/
             padding-left: 5px;
             color: #8F9EAB;
             border-radius: 5px;
@@ -166,21 +165,21 @@
         }
 
         .input-row {
-            border: 1px solid #DCE1E5;
-            padding: 3px 10px;
-            margin-bottom: 10px;
-            border-radius: 0.25rem;
+            margin: 8px 0;
+            font-size: 16px;
         }
-
-        .input-row input {
-            padding-right: 5px;
-            font-size: 14px;
+        .input-row input[type="number"],.input-row input[type="password"]{
+          height: 1.9rem;
+        }
+        .input-row input,
+        .input-row input::-webkit-input-placeholder {
+            font-size: 16px;
+            color: #B5C0CF;
         }
 
         .input-row .coinName {
-            padding: 2px 0 2px 10px;
-            border-left: 1px solid #EAEDF0;
             margin-left: 10px;
+            color: #B5C0CF;
         }
 
         .clickOrder {
@@ -198,6 +197,69 @@
         .myadv {
             font-size: 14px;
             margin-top: 25px;
+        }
+
+        .input-box {
+            border-bottom: 1px solid #DCE1E5;
+        }
+
+        .input-box .all {
+            height: 100%;
+            line-height: 1.9rem;
+        }
+
+        .payBox .userName {
+            width: 100px;
+        }
+
+        .radio_type {
+            width: 20px;
+            height: 20px;
+            -webkit-appearance: none;
+            position: relative;
+        }
+
+        .radio_type:before {
+            content: '';
+            width: 15px;
+            height: 15px;
+            border: 2px solid #3F81CE;
+            display: inline-block;
+            border-radius: 50%;
+            vertical-align: middle;
+        }
+
+        .radio_type:checked:before {
+            content: '';
+            width: 15px;
+            height: 15px;
+            border: 2px solid #3F81CE;
+            display: inline-block;
+            border-radius: 50%;
+            vertical-align: middle;
+        }
+
+        .radio_type:checked:after {
+            content: '';
+            width: 9px;
+            height: 9px;
+            text-align: center;
+            background: #3F81CE;
+            border-radius: 50%;
+            display: block;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-55%,-15%);
+        }
+
+        .radio_type:checked+label {
+            color: #3F81CE;
+        }
+        .payBox .item{
+          border-bottom: 1px solid #DCE1E5;
+          padding: 10px 0;
+          font-size: 14px;
         }
     </style>
 </head>
@@ -255,16 +317,54 @@
                 </div>
                 <div class="c"></div>
             </div>
-            <div class="input-row flex-box-center">
-                <input type="number" v-model="price" placeholder="请输入单价" class="flex-con">
-                <div class="blue coinName">CNY</div>
+            <div class="flex-box-between input-row"><label class="fs14">参考价格</label>
+                <div>1 {{coinName}}≈6.98 CNY</div>
             </div>
-            <div class="input-row flex-box-center">
-                <input type="number" v-model="num" placeholder="请输入数量" class="flex-con">
-                <div class="blue coinName">{{coinName}}</div>
+            <div class="input-row sellRow">
+                <label class="fs14">交易单价 CNY</label>
+                <div class="input-box">
+                    <input type="number" v-model="price" placeholder="请输入单价" class="flex-con">
+                </div>
             </div>
             <div class="input-row">
-                <input type="password" v-model="pwd" placeholder="请输入交易密码" class="flex-con">
+                <label class="fs14">交易数量 {{coinName}}</label>
+                <div class="input-box flex-box-between">
+                    <input type="number" v-model="num" placeholder="请输入数量" class="flex-con">
+                    <div class="blue all">全部</div>
+                </div>
+            </div>
+            <div class="input-row">
+                <label class="fs14">最小单笔限额 CNY</label>
+                <div class="input-box flex-box-between">
+                    <input type="number" v-model="minPrice" placeholder="最小单笔限额：100" class="flex-con">
+                    <div class="coinName fs14">0.00{{coinName}}</div>
+                </div>
+            </div>
+            <div class="input-row">
+                <label class="fs14">最大单笔限额 CNY</label>
+                <div class="input-box flex-box-between">
+                    <input type="number" v-model="maxPrice" placeholder="最大单笔限额：5000" class="flex-con">
+                    <div class="coinName fs14">0.00{{coinName}}</div>
+                </div>
+            </div>
+            <div class="input-row">
+                <label class="fs14">交易密码</label>
+                <div class="input-box flex-box-between">
+                    <input type="password" v-model="pwd" placeholder="请输入交易密码" class="flex-con">
+                </div>
+            </div>
+            <div class="input-row">
+                <label class="fs14">请选择支付方式</label>
+                <div class="payBox">
+                    <div class="item flex-box-between">
+                        <label for="card"><div>银行卡</div><div><span class="userName">夏伟</span>***379</div></label>
+                        <input type="radio" name="travel" class="radio_type" value="item.id" checked="" id="card">
+                    </div>
+                    <div class="item flex-box-between">
+                        <label for="zfb"><div>支付宝</div><div><span class="userName">夏伟</span>***379@qq.com</div></label>
+                        <input type="radio" name="travel" class="radio_type" value="item.id" id="zfb">
+                    </div>
+                </div>
             </div>
             <div class="tx-c  margin-b-10  margin-t-15">
                 <button class="aui-btn clickOrder" type="button" :disabled="num==''||price==''||pwd==''">卖出</button>
@@ -291,7 +391,9 @@
                 price: '',
                 num: '',
                 pwd: '',
-                coinName: ''
+                minPrice:'',
+                maxPrice:'',
+                coinName: 'USDT'
             },
             mounted: function() {
                 var $this = this;

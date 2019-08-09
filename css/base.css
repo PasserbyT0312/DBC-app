@@ -107,6 +107,15 @@ button.but_3{ color: #FFF; background: #d81e06; border-radius: 5px; padding: 3px
     -webkit-flex: 1;
     flex: 1;
 }
+.fs12{
+  font-size: 12px;
+}
+.fs14{
+  font-size: 14px;
+}
+.fs18{
+  font-size: 18px;
+}
 /* 清除inputnumber下默认样式 */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {

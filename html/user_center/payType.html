@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>支付方式管理</title>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/base.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/touchslider.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/coin.css" />
+    <script src="../../script/const.js"></script>
+    <style>
+        html,
+        body {
+            font-size: 16px;
+            cursor: pointer;
+            background: #fff;
+        }
+
+
+        .aui-bar-nav .aui-btn .aui-iconfont {
+            color: #8F9EAB;
+            font-weight: bold;
+        }
+
+        .orderList {
+            padding: 0 0 10px;
+        }
+
+        .gray {
+            color: #97A5B1;
+        }
+
+        .blue {
+            color: #273F57;
+        }
+
+        .orderStatus {
+            color: #4082CF;
+        }
+
+        .item {
+            padding: 15px;
+            border-bottom: 1px solid #F1F3F4;
+        }
+
+        .title {
+            font-size: 14px;
+            color: #B5C0CF;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <!--头部标题-->
+        <div class="com_head blue">
+            <div class="back_but" onclick="$A.change_frame('user_setup_index')"></div>
+            <div class="title">支付方式管理</div>
+        </div>
+        <div id="orderList" class="orderList" style="overflow: auto">
+            <div class="item" v-for="item in orderList" @click="bindFor(item)">
+                <div class="flex-box-between">
+                    <div class="orderStatus blue">{{item.name}}</div>
+                    <div class="gray">{{payStatus[item.status]}} <span v-if="item.account==''" class="aui-iconfont aui-icon-right"></span></div>
+                </div>
+                <div v-if="item.account!=''" class="title aui-margin-b-10 aui-margin-t-15">
+                    {{item.userName}}
+                </div>
+                <div v-if="item.account!=''" class="blue userName">{{item.account}}</div>
+            </div>
+        </div>
+
+</body>
+
+<script type="text/javascript" src="../../script/lib/api.js"></script>
+<script type="text/javascript" src="../../script/lib/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="../../script/lib/base.js"></script>
+<script type="text/javascript" src="../../script/lib/vue.js"></script>
+<script>
+    var app = new Vue({
+            el: "#app",
+            data: {
+                payStatus: ['未綁定', ''],
+                orderList: [{
+                    id: 1,
+                    status: 0,
+                    name: '中国银行',
+                    type:0,
+                    userName: '赵小米',
+                    account: '6200 0000 0158 0522 385',
+                }, {
+                    id: 2,
+                    status: 0,
+                    name: '支付寶',
+                    type:1,
+                    userName: '赵小米',
+                    account: '',
+                }],
+            },
+            mounted: function () {
+
+
+
+            },
+            methods: {
+                bindFor: function(oid) {
+                    if (oid.status == 0) {
+                        if(oid.type==0){
+                          $A.change_frame('bindCard');
+                        }else{
+                          $A.change_frame('bindAliPay');
+                        }
+                    }
+
+                },
+                undoOrder: function() {
+                    api.confirm({
+                        title: '撤销广告',
+                        msg: '您确认要进行该操作么？',
+                        buttons: ['確定', '取消']
+                    }, function(ret, err) {
+                        if (ret.buttonIndex === 2) {
+                            return;
+                        }
+                        api.closeFrame({});
+                    })
+                },
+            }
+        })
+</script>
+
+</html>

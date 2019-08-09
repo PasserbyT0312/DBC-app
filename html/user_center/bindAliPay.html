@@ -5,74 +5,101 @@
     <meta name="viewport"
           content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
     <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
-    <title>身份信息认证-提交</title>
-    <link rel="stylesheet" type="text/css" href="../../css/base.css"/>
-    <link rel="stylesheet" type="text/css" href="../../css/custom.css"/>
-    <link rel="stylesheet" type="text/css" href="../../css/touchslider.css"/>
-    <link rel="stylesheet" type="text/css" href="../../css/coin.css"/>
+    <title>绑定支付宝</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/base.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/touchslider.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/coin.css" />
     <script src="../../script/const.js"></script>
+    <style>
+    html,
+    body {
+        font-size: 16px;
+        background: #fff;
+    }
+    .bindBox {
+        padding: 0 15px 10px;
+    }
+    .input-row {
+        margin: 8px 0;
+        font-size: 16px;
+    }
+    .input-row input,
+    .input-row input::-webkit-input-placeholder {
+        font-size: 16px;
+        color: #B5C0CF;
+    }
+
+    .input-row .coinName {
+        margin-left: 10px;
+        color: #B5C0CF;
+    }
+
+    .saveBind {
+        background: #3D80CE;
+        width: 90%;
+        color: #fff;
+        height: 2.2rem;
+        font-size: 16px;
+    }
+
+    .saveBind:disabled {
+        background: #C7CED4;
+    }
+
+    .myadv {
+        font-size: 14px;
+        margin-top: 25px;
+    }
+
+    .input-box {
+        border-bottom: 1px solid #DCE1E5;
+    }
+    .saveBind{
+      margin-top: 30px;
+    }
+    .img_row{
+      margin-top: 10px;
+    }
+    .img_row img{
+      width: 80px;
+      height: 80px;
+    }
+    </style>
 </head>
 <body>
-<div id="app" class="auth_submit_page">
+<div id="app">
 
     <!--头部标题-->
     <div class="com_head blue">
-        <div class="back_but" onclick="$A.change_frame('user_setup_index')"></div>
-        <div class="title">身份信息認證-提交</div>
+        <div class="back_but" onclick="$A.change_frame('payType')"></div>
+        <div class="title">綁定支付寶</div>
     </div>
-
-    <form action="">
-        <div class="item">
-            <div class="name">證件類型:</div>
-            <div class="content">
-                <span class="card_type">身份證</span>
-            </div>
-        </div>
-        <div class="item">
-            <div class="name">證件號碼:</div>
-            <div class="content">
-                <input v-model="idcard" type="text">
-            </div>
-        </div>
-        <div class="item">
-            <div class="name">證件姓名:</div>
-            <div class="content">
-                <input v-model="true_name" type="text">
-            </div>
-        </div>
-    </form>
-
-
-  <!--  <div class="img_upload_item">
-          <div class="name">手持證件照:</div>
-        <div class="img_row">
-            <img :src="idcardimg1?idcardimg1_local:'../../images/upload_img.png'">
-            <button class="but_1_1" @click="choose_by_album(1)">上傳圖片</button>
-            <input type="text" v-model="idcardimg1">
-        </div>
-    </div>-->
-    <div class="img_upload_item">
-        <div class="name">證件-正面:</div>
-        <div class="img_row">
-            <img :src="idcardimg2_local?idcardimg2_local:'../../images/upload_img.png'">
-              <button class="but_1_1" @click="choose_by_album(2)">上傳圖片</button>
-            <!--<input type="text" v-model="idcardimg2">-->
-        </div>
+    <div class="bindBox">
+      <div class="input-row sellRow">
+          <label class="fs14">姓名</label>
+          <div class="input-box">
+              <input type="number" v-model="name" placeholder="請輸入姓名" class="flex-con">
+          </div>
+      </div>
+      <div class="input-row">
+          <label class="fs14">賬號</label>
+          <div class="input-box flex-box-between">
+              <input type="number" v-model="account" placeholder="請輸入賬號" class="flex-con">
+          </div>
+      </div>
+      <div class="input-row">
+          <label class="fs14">添加收款二維碼（選填）</label>
+          <div class="img_row">
+              <img :src="codeImg?codeImg:'../../images/addImg.png'" @click="choose_by_album()">
+          </div>
+      </div>
+      <div class="tx-c">
+          <button class="aui-btn saveBind" type="button">保存</button>
+      </div>
     </div>
-    <div class="img_upload_item">
-        <div class="name">證件-反面:</div>
-        <div class="img_row">
-            <img :src="idcardimg3_local?idcardimg3_local:'../../images/upload_img.png'">
-            <button class="but_1_1" @click="choose_by_album(3)">上傳圖片</button>
-            <!--<input type="text" v-model="idcardimg3">-->
-        </div>
-    </div>
-
-
-    <div class="submit_outer" style="padding-bottom: 0.4rem">
-        <button class="but_1" type="button" @click="submit()">確認提交</button>
-    </div>
-
 </div>
 
 </body>
@@ -86,44 +113,12 @@
     var app = new Vue({
         el: '#app',
         data: {
-            idcard: "",
-            true_name: "",
-            idcardimg1: "",
-            idcardimg1_local: "",
-            idcardimg2: "",
-            idcardimg2_local: "",
-            idcardimg3: "",
-            idcardimg3_local: "",
-            idcardimg_title: ['手持證件照', '證件-正面', '證件-反面'],
+          name:'',
+          account:'',
+          codeImg:''
         },
         mounted: function () {
-            this.idcard = ""
-            this.true_name = ""
-            this.idcardimg1 = ""
-            this.idcardimg2 = ""
-            this.idcardimg3 = ""
 
-            if ($A.dev_model === 0) {
-                this.idcard = "612331656664111133"
-                this.true_name = "張三"
-                this.idcardimg1 = ""
-                this.idcardimg2 = ""
-                this.idcardimg3 = ""
-            }
-
-            var $this = this
-            setTimeout(function () {
-                // 监听属性
-                api.addEventListener({
-                    name: 'user_setup_auth_submit_reflush'
-                }, function (ret, err) {
-                    $this.idcard = ""
-                    $this.true_name = ""
-                    $this.idcardimg1 = ""
-                    $this.idcardimg2 = ""
-                    $this.idcardimg3 = ""
-                });
-            }, 600)
         },
         methods: {
             // 上传信息

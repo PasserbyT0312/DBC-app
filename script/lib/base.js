@@ -1220,6 +1220,27 @@ $A.frames = [
       url: '../trade/myAdv.html',
       is_reload: true,
       historyGestureEnabled: true,
+    },
+    {
+      //绑定银行卡
+      name: 'bindCard',
+      url: '../user_center/bindCard.html',
+      is_reload: true,
+      historyGestureEnabled: true,
+    },
+    {
+      //绑定支付宝
+      name: 'bindAliPay',
+      url: '../user_center/bindAliPay.html',
+      is_reload: true,
+      historyGestureEnabled: true,
+    },
+    {
+      //支付方式管理页面
+      name: 'payType',
+      url: '../user_center/payType.html',
+      is_reload: true,
+      historyGestureEnabled: true,
     }
 ]
 

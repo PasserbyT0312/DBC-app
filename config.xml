@@ -59,4 +59,7 @@
 	<permission name="hardware" />
 
   <preference name="querySchemes" value="weixin,sinaweibo" />
+  <preference name="checkSslTrusted" value="false" />
+  <preference name="appCertificateVerify" value="false" />
+
 </widget>
