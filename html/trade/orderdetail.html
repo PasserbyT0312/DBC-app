@@ -13,9 +13,10 @@
     <link rel="stylesheet" type="text/css" href="../../css/coin.css" />
     <script src="../../script/const.js"></script>
     <style>
-      html{
-        font-size: 18px;
-      }
+        html {
+            font-size: 18px;
+        }
+
         .com_head {
             background: #0852C4;
             font-size: 14px;
@@ -27,12 +28,14 @@
             color: #fff;
             padding: 0 15px 15px;
         }
-        .statusIcon{
-          width: 25px;
-          height: 25px;
-          display: inline-block;
-          margin-right: 10px;
+
+        .statusIcon {
+            width: 25px;
+            height: 25px;
+            display: inline-block;
+            margin-right: 10px;
         }
+
         .orderNum {
             padding: 15px;
             background: #fff;
@@ -65,82 +68,95 @@
             border-color: #F0F2F4;
         }
 
-        .aui-list .aui-list-item-title,.aui-list .aui-list-item-label{
+        .aui-list .aui-list-item-title,
+        .aui-list .aui-list-item-label {
             color: #8FA2AF;
             font-size: 14px;
         }
 
-        .aui-list .aui-list-item-right, .aui-list .aui-list-item-input input{
+        .aui-list .aui-list-item-right,
+        .aui-list .aui-list-item-input input {
             font-size: 14px;
             color: #1F3F59;
         }
-        .btn_row{
-          background: #fff;
-          padding: 1rem;
-          text-align: center;
-          font-size: 14px;
-          position: fixed;
-          width: 100%;
-          bottom: 0;
+
+        .btn_row {
+            background: #fff;
+            padding: 1rem;
+            text-align: center;
+            font-size: 14px;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
         }
-        .btn_row .cancel{
-          background: #F7F7FB;
-          color: #23425C;
-          width: 40%;
-          padding: 10px 0;
+
+        .btn_row .cancel {
+            background: #F7F7FB;
+            color: #23425C;
+            width: 40%;
+            padding: 10px 0;
         }
-        .btn_row .paySuccess{
-          background: #1882D4;
-          color: #fff;
-          width: 55%;
-          padding: 10px 0;
+
+        .btn_row .paySuccess {
+            background: #1882D4;
+            color: #fff;
+            width: 55%;
+            padding: 10px 0;
         }
-        .copyBtn{
-          display: inline-block;
-          width: 15px;
-          height: 15px;
-          vertical-align: middle;
+
+        .copyBtn {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            vertical-align: middle;
         }
-        .codeIcon{
-          width: 25px;
-          height: 25px;
+
+        .codeIcon {
+            width: 25px;
+            height: 25px;
         }
         /*遮罩*/
-        div.mask{
-          background: rgba(0, 0, 0, 0.5);
+
+        div.mask {
+            background: rgba(0, 0, 0, 0.5);
         }
-      .overhide{
-        overflow: hidden;
-        height: 100%;
-      }
-      .codePop{
-        position: fixed;
-        z-index: 12;
-        width:80%;
-        height:65%;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%,-50%);
-        background: #fff;
-        padding: 20px;
-      }
-      .codeImg{
-        height: 89%;
-        width: 100%;
-      }
-      .saveImg{
-        background: #1882D4;
-        color: #fff;
-        text-align: center;
-        padding: 10px 0;
-        margin-top: 10px;
-      }
-      .closePop{
-        width: 35px;
-        height: 35px;
-        margin: 0 auto;
-        margin-top: 50px;
-      }
+
+        .overhide {
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .codePop {
+            position: fixed;
+            z-index: 12;
+            width: 80%;
+            height: 65%;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background: #fff;
+            padding: 20px;
+        }
+
+        .codeImg {
+            height: 89%;
+            width: 100%;
+        }
+
+        .saveImg {
+            background: #1882D4;
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+            margin-top: 10px;
+        }
+
+        .closePop {
+            width: 35px;
+            height: 35px;
+            margin: 0 auto;
+            margin-top: 50px;
+        }
     </style>
 </head>
 
@@ -150,47 +166,70 @@
         <header id="pack" class="aui-bar aui-bar-nav com_head">
             <div class="back_but" tapmode onclick="closeFrame()"></div>
         </header>
-        <div class="top flex-center">
-            <img v-if="detail.status==0||detail.status==1" src="../../css/img/wait.png" alt="" class="statusIcon">
-            <img v-else-if="detail.status==3" src="../../css/img/success.png" alt="" class="statusIcon">
-            <img v-else-if="detail.status==4" src="../../css/img/sale.png" alt="" class="statusIcon">
-            <img v-else src="../../css/img/cancel.png" alt="" class="statusIcon">
-            {{orderStatus[detail.status]}}
+        <div class="top">
+            <div v-if="detail.status==0" class="flex-center">
+              <img src="../../css/img/wait.png" alt="" class="statusIcon">
+              待支付
+            </div>
+            <div  v-else-if="detail.status==1" class="flex-center">
+              <img src="../../css/img/wait.png" alt="" class="statusIcon">
+              待確認
+            </div>
+            <div  v-else-if="detail.status==2" class="flex-center">
+              <img src="../../css/img/success.png" alt="" class="statusIcon">
+              已完成
+            </div>
+            <div  v-else-if="detail.status==3" class="flex-center">
+              <img src="../../css/img/sale.png" alt="" class="statusIcon">
+              掛賣中
+            </div>
+            <div  v-else class="flex-center">
+              <img src="../../css/img/cancel.png" alt="" class="statusIcon">
+              已取消
+            </div>
         </div>
         <div class="orderNum">
-            <div class="total">¥ 2300.00 <img src="../../css/img/copy.png" alt="" class="copyBtn" @click="$A.copy(1111111)"></div>
-            <div class="title"><label>单价</label>¥1473.20</div>
-            <div class="title"><label>数量</label>1.561227 ETH</div>
+            <div class="total">¥ {{detail.money}} <img src="../../css/img/copy.png" alt="" class="copyBtn" @click="$A.copy(detail.money)"></div>
+            <div class="title"><label>單價</label>¥{{detail.price}}</div>
+            <div class="title"><label>數量</label>{{detail.amount}} {{detail.coin_name}}</div>
         </div>
         <div class="payBox">
-            <div v-show="detail.status==0||detail.status==1||detail.status==3" class="aui-content aui-margin-b-15">
-                <ul class="aui-list aui-list-in">
+            <div v-show="detail.status==0||detail.status==1||detail.status==2" class="aui-content aui-margin-b-15">
+                <ul v-if="detail.pay_alipay" class="aui-list aui-list-in">
                     <li class="aui-list-item aui-list-item-middle">
                         <div class="aui-list-item-inner aui-list-item-arrow">
-                            <div class="aui-list-item-title">支付宝</div>
+                            <div  class="aui-list-item-title">支付寶</div>
                         </div>
                     </li>
                     <li class="aui-list-item">
                         <div class="aui-list-item-inner">
-                            <div class="aui-list-item-title">{{detail.sale==0?'收':'付'}}款人</div>
-                            <div class="aui-list-item-right">程家明 <img src="../../css/img/copy.png" alt="" class="copyBtn"></div>
+                            <div class="aui-list-item-title">{{detail.act_type==0?'收':'付'}}款人</div>
+                            <div class="aui-list-item-right">{{detail.act_type==0?detail.sale_name:detail.buy_name}} <img src="../../css/img/copy.png" alt="" class="copyBtn" @click="$A.copy(detail.act_type==0?detail.sale_name:detail.buy_name)"></div>
+                        </div>
+                    </li>
+                    <li class="aui-list-item">
+                        <div  class="aui-list-item-inner">
+                            <div  class="aui-list-item-title">支付寶賬號</div>
+                            <div class="aui-list-item-right">{{detail.pay_alipay.account}} <img src="../../css/img/copy.png" alt="" class="copyBtn"  @click="$A.copy(detail.pay_alipay.account)"></div>
+                        </div>
+                    </li>
+                </ul>
+                <ul v-if="detail.pay_bank" class="aui-list aui-list-in">
+                    <li class="aui-list-item aui-list-item-middle">
+                        <div class="aui-list-item-inner aui-list-item-arrow">
+                            <div class="aui-list-item-title">銀行卡 {{detail.pay_bank.bank_name}}</div>
                         </div>
                     </li>
                     <li class="aui-list-item">
                         <div class="aui-list-item-inner">
-                            <div class="aui-list-item-title">收款二维码</div>
-                            <div class="aui-list-item-right"><img src="../../css/img/codeHave.png" alt="" class="codeIcon" @click="showCode"></div>
+                            <div class="aui-list-item-title">{{detail.act_type==0?'收':'付'}}款人</div>
+                            <div class="aui-list-item-right">{{detail.act_type==0?detail.sale_name:detail.buy_name}} <img src="../../css/img/copy.png" alt="" class="copyBtn" @click="$A.copy(detail.act_type==0?detail.sale_name:detail.buy_name)"></div>
                         </div>
                     </li>
                     <li class="aui-list-item">
                         <div class="aui-list-item-inner">
-                            <div class="aui-list-item-title">支付宝账号</div>
-                            <div class="aui-list-item-right">13069477367 <img src="../../css/img/copy.png" alt="" class="copyBtn"></div>
-                        </div>
-                    </li>
-                    <li v-show="detail.status==0&&detail.sale==0" class="aui-list-item">
-                        <div class="aui-list-item-inner">
-                            <div class="aui-list-item-title" style="color:#1F3F59;">请使用本人（*志伟）支付宝向以上账号自行转账</div>
+                            <div  class="aui-list-item-title">銀行卡賬號</div>
+                            <div class="aui-list-item-right">{{detail.pay_bank.card}}  <img src="../../css/img/copy.png" alt="" class="copyBtn"  @click="$A.copy(detail.pay_bank.card)"></div>
                         </div>
                     </li>
                 </ul>
@@ -201,57 +240,46 @@
                 <ul class="aui-list aui-list-in">
                     <li class="aui-list-item">
                         <div class="aui-list-item-inner">
-                            <div class="aui-list-item-title">{{detail.sale==0?'卖':'买'}}家昵称</div>
-                            <div class="aui-list-item-right">这是一个昵称</div>
+                            <div class="aui-list-item-title">{{detail.act_type==0?'賣':'買'}}家實名</div>
+                            <div class="aui-list-item-right">{{detail.act_type==0?detail.sale_name:detail.buy_name}} <img src="../../css/img/copy.png" alt="" class="copyBtn" @click="$A.copy(detail.act_type==0?detail.sale_name:detail.buy_name)"></div>
                         </div>
                     </li>
                     <li class="aui-list-item">
                         <div class="aui-list-item-inner">
-                            <div class="aui-list-item-title">{{detail.sale==0?'卖':'买'}}家实名</div>
-                            <div class="aui-list-item-right">陈伟志 <img src="../../css/img/copy.png" alt="" class="copyBtn"></div>
+                            <div class="aui-list-item-title">訂單號</div>
+                            <div class="aui-list-item-right">{{detail.order_no}} <img src="../../css/img/copy.png" alt="" class="copyBtn" @click="$A.copy(detail.order_no)"></div>
                         </div>
                     </li>
                     <li class="aui-list-item">
                         <div class="aui-list-item-inner">
-                            <div class="aui-list-item-title">订单号</div>
-                            <div class="aui-list-item-right">115645711074257 <img src="../../css/img/copy.png" alt="" class="copyBtn"></div>
+                            <div class="aui-list-item-title">付款參考號</div>
+                            <div class="aui-list-item-right">{{detail.pay_num}} <img src="../../css/img/copy.png" alt="" class="copyBtn" @click="$A.copy(detail.pay_num)"></div>
                         </div>
                     </li>
                     <li class="aui-list-item">
                         <div class="aui-list-item-inner">
-                            <div class="aui-list-item-title">付款参考号</div>
-                            <div class="aui-list-item-right">334762 <img src="../../css/img/copy.png" alt="" class="copyBtn"></div>
-                        </div>
-                    </li>
-                    <li class="aui-list-item">
-                        <div class="aui-list-item-inner">
-                            <div class="aui-list-item-title">下单时间</div>
-                            <div class="aui-list-item-right">2018-08-17 14:22:05</div>
+                            <div class="aui-list-item-title">下單時間</div>
+                            <div class="aui-list-item-right">{{detail.create_time}}</div>
                         </div>
                     </li>
                 </ul>
             </div>
         </div>
         <!-- 待付款 -->
-        <div v-show="detail.status==0&&detail.sale==0" class="btn_row flex-box-between">
-            <div class="cancel" @click="cancelBuyOrder">取消订单</div>
-            <div class="paySuccess">我已付款成功</div>
+        <div v-show="detail.status==0&&detail.act_type==0" class="btn_row flex-box-between">
+            <div class="cancel" @click="cancelBuyOrder">取消訂單</div>
+            <div class="paySuccess" @click="paymentPay">我已付款成功</div>
         </div>
         <!-- 待确认 -->
-        <div v-show="detail.status==1&&detail.sale==1" class="btn_row flex-box-between">
-            <div class="cancel" @click="cancelSaleOrder">取消订单</div>
-            <div class="paySuccess">我已收款成功</div>
-        </div>
-        <!-- 挂卖中 -->
-        <div v-show="detail.status==4&&detail.sale==1" class="btn_row">
-            <div class="cancel" @click="undoOrder" style="width:100%;">撤销</div>
+        <div v-show="detail.status==1&&detail.act_type==1" class="btn_row flex-box-between">
+            <div class="paySuccess" @click="collectionPay" style="width:100%;">我已收款成功</div>
         </div>
         <!-- 遮罩层-->
-        <div v-show="isShow" class="codePop">
-          <img src="../../css/img/1.png" alt="" class="codeImg">
-          <div class="saveImg" @click="saveImg">保存二维码</div>
-          <img src="../../css/img/close.png" alt="" class="closePop" @click="closeCode">
-        </div>
+        <!-- <div v-show="isShow" class="codePop">
+            <img :src="detail." alt="" class="codeImg">
+            <div class="saveImg" @click="saveImg">保存二维码</div>
+            <img src="../../css/img/close.png" alt="" class="closePop" @click="closeCode">
+        </div> -->
 </body>
 
 <script type="text/javascript" src="../../script/lib/api.js"></script>
@@ -259,79 +287,204 @@
 <script type="text/javascript" src="../../script/lib/base.js"></script>
 <script type="text/javascript" src="../../script/lib/vue.js"></script>
 <script>
-apiready = function() {
-  // console.log(api.pageParam.orderId);
-  var app = new Vue({
-      el: "#app",
-      data: {
-        status:0,
-        isShow:false,
-        orderStatus:['待付款','待确认','已取消','已完成','挂卖中'],
-        detail:api.pageParam.orderId
-      },
-      methods: {
-          cancelBuyOrder:function () {
-            api.confirm({
-                title: '确认取消交易',
-                msg: '如果您已经向卖家付款，请千万不要取消交易',
-                buttons: ['確定', '取消']
-            }, function (ret, err) {
-                if (ret.buttonIndex === 2) {
-                    return;
-                }
-                api.closeFrame({});
-            })
-          },
-          cancelSaleOrder:function () {
-            api.confirm({
-                title: '确认取消交易',
-                msg: '如果您已经收到买家付款，请千万不要取消交易',
-                buttons: ['確定', '取消']
-            }, function (ret, err) {
-                if (ret.buttonIndex === 2) {
-                    return;
-                }
-                api.closeFrame({});
-            })
-          },
-          undoOrder:function () {
-            api.confirm({
-                title: '撤销广告',
-                msg: '您确认要进行该操作么？',
-                buttons: ['確定', '取消']
-            }, function (ret, err) {
-                if (ret.buttonIndex === 2) {
-                    return;
-                }
-                api.closeFrame({});
-            })
-          },
-          showCode:function () {
-            $('html,body').addClass('overhide'); //使网页不可滚动
-            this.isShow = true;
-            $A.mask();
-          },
-          closeCode:function () {
-            $('html,body').removeClass('overhide'); //使网页不可滚动
-            this.isShow = false;
-            $A.mask(false);
-          },
-          saveImg:function () {
-            api.saveMediaToAlbum({
-                path: 'http://module.apicloud.com/icon/1492678073326_IMG_1345.PNG'
-            }, function(ret, err) {
-                if (ret && ret.status) {
-                    alert('保存成功');
-                } else {
-                    alert('请允许DBC访问您的相册权限');
-                }
-            });
-          }
-      }
-  })
-}
+    apiready = function() {
+        // console.log(api.pageParam.orderId);
+        var app = new Vue({
+            el: "#app",
+            data: {
+                status: 0,
+                isShow: false,
+                detail: {},
+                order_no:api.pageParam.orderId,
+                tradePwd:''
+            },
+            mounted: function() {
+                this.getDetail();
+            },
+            methods: {
+                getDetail:function () {
+                  var $this = this;
+                  var tokens = api.getPrefs({
+                      sync: true,
+                      key: 'token'
+                  });
+                  var params = {
+                      token: tokens,
+                      order_no:this.order_no
+                  };
+                  // console.log(this.order_no);
+                  $A.request('otc/details', params, function(data) {
+                        // console.log(JSON.stringify(data));
+                        // console.log(JSON.stringify(data));
+                        $this.detail = data;
+                  })
+                },
+                cancelBuyOrder: function() {
+                    var $this = this;
+                    api.confirm({
+                        title: '確認取消交易',
+                        msg: '如果您已經向賣家付款，請千萬不要取消交易',
+                        buttons: ['確定', '取消']
+                    }, function(ret, err) {
+                        if (ret.buttonIndex === 2) {
+                            return;
+                        }
+                        $this.cancelOrder();
+                    })
+                },
+                cancelOrder: function() {
+                      var $this = this;
+                    var tokens = api.getPrefs({
+                        sync: true,
+                        key: 'token'
+                    });
+                    var params = {
+                        token: tokens,
+                        order_no: this.order_no,
+                    };
+                    $A.request('otc/cancel', params, function(data) {
+                        // console.log(data);
+                        // console.log(JSON.stringify(data));
+                        $this.getDetail();
+                        api.sendEvent({
+                            name: 'changeOtcOrder',
+                        });
+                    })
+                },
+                //确认收款
+                collectionPay: function() {
+                    var dialogBox = api.require('dialogBox');
+                    var $this = this;
+                    dialogBox.input({
+                        keyboardType: 'secure',
+                        texts: {
+                            title: '請輸入交易密碼',
+                            placeholder: '請輸入交易密碼',
+                            leftBtnTitle: '取消',
+                            rightBtnTitle: '確定'
+                        },
+                        styles: {
+                            bg: '#fff',
+                            corner: 2,
+                            w: 300,
+                            h: 180,
+                            title: {
+                                h: 30,
+                                alignment: 'center',
+                                size: 16,
+                                color: '#000',
+                                marginT: 10,
+                            },
+                            input: {
+                                h: 30,
+                                marginT: 40,
+                                marginLeft: 10,
+                                marginRight: 10,
+                                textSize: 16,
+                                textColor: '#000'
+                            },
+                            dividingLine: {
+                                width: 0.5,
+                                color: '#696969'
+                            },
+                            left: {
+                                bg: 'rgba(0,0,0,0)',
+                                color: '#666',
+                                size: 14
+                            },
+                            right: {
+                                bg: 'rgba(0,0,0,0)',
+                                color: '#007FFF',
+                                size: 14
+                            },
+                            horizontalLine: {
+                                color: 'rgba(0,0,0,0.2)', //（可选项）字符串类型；左右按钮上边横线的颜色，支持rgb、rgba、#；默认：'rgba(245,245,245,0)'
+                                height: 1 //（可选项）数字类型；左右边按钮横线的高度；默认：0
+                            },
+                            verticalLine: {
+                                color: 'rgba(0,0,0,0.2)', //（可选项）字符串类型；左右按钮中间竖线的颜色，支持rgb、rgba、#；默认：'rgba(245,245,245,0)'
+                                width: 1 //（可选项）数字类型；左右边按钮竖线的高度；默认：0
+                            },
+                        }
+                    }, function(ret) {
+                        if (ret.eventType == 'right') {
+                            $this.tradePwd = ret.text;
+                            if($this.tradePwd == ''){
+                              $A.alert('請輸入交易密碼')
+                            }else{
+                              var tokens = api.getPrefs({
+                                  sync: true,
+                                  key: 'token'
+                              });
+                              var params = {
+                                  token: tokens,
+                                  order_no:$this.order_no,
+                                  pay_password:$this.tradePwd,
+                              };
+                              dialogBox.close({
+                                  dialogName: 'input'
+                              });
+                              $A.request('otc/confirm', params, function(data) {
+                                    // console.log(data);
+                                    // console.log(JSON.stringify(data));
+                                    $this.getDetail();
+                                    api.sendEvent({
+                                        name: 'changeOtcOrder',
+                                    });
+                              })
+                            }
+                        }else{
+                          dialogBox.close({
+                              dialogName: 'input'
+                          });
+                        }
+                    });
 
-
+                },
+                //确认付款
+                paymentPay:function () {
+                  var $this = this;
+                  var tokens = api.getPrefs({
+                      sync: true,
+                      key: 'token'
+                  });
+                  var params = {
+                      token: tokens,
+                      order_no:this.order_no
+                  };
+                  $A.request('otc/confirm_pay', params, function(data) {
+                        // console.log(data);
+                        // console.log(JSON.stringify(data));
+                        $this.getDetail();
+                        api.sendEvent({
+                            name: 'changeOtcOrder',
+                        });
+                  })
+                },
+                showCode: function() {
+                    $('html,body').addClass('overhide'); //使网页不可滚动
+                    this.isShow = true;
+                    $A.mask();
+                },
+                closeCode: function() {
+                    $('html,body').removeClass('overhide'); //使网页不可滚动
+                    this.isShow = false;
+                    $A.mask(false);
+                },
+                saveImg: function() {
+                    api.saveMediaToAlbum({
+                        path: 'http://module.apicloud.com/icon/1492678073326_IMG_1345.PNG'
+                    }, function(ret, err) {
+                        if (ret && ret.status) {
+                            alert('保存成功');
+                        } else {
+                            alert('请允许DBC访问您的相册权限');
+                        }
+                    });
+                }
+            }
+        })
+    }
 </script>
 
 </html>

@@ -218,11 +218,27 @@
                         $this.choose_by_album()
                     }
                     if (index === 2) {
-                        var cameraTool = api.require('cameraTool');
-                        cameraTool.openCamera(function (ret, err) {
-                            $this.upload_icon(ret.imgPath)
-                            //api.prompt({title: "信息", msg: "图片路径：" + ret.imgPath, buttons: ["取消", "确定"]});
+                      api.getPicture({
+                            sourceType: 'camera',
+                            encodingType: 'png',
+                            mediaValue: 'pic',
+                            allowEdit: false,
+                            quality: 90,
+                            saveToPhotoAlbum: true
+                        }, function(ret, err) {
+                            // 获取拍照数据并处理
+                            if (ret) {
+                                var imgSrc = ret.data;
+                                if (imgSrc != "") {
+                                    $this.upload_icon(imgSrc)
+                                }
+                            }
                         });
+                        // var cameraTool = api.require('cameraTool');
+                        // cameraTool.openCamera(function (ret, err) {
+                        //     $this.upload_icon(ret.imgPath)
+                        //     //api.prompt({title: "信息", msg: "图片路径：" + ret.imgPath, buttons: ["取消", "确定"]});
+                        // });
                     }
                     //$A.toast(index)
                 });

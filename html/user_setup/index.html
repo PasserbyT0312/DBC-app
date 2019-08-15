@@ -36,8 +36,8 @@
             <div class="name">修改-交易密碼</div>
             <div class="arrow"></div>
         </div>
-        <div class="item" onclick="$A.change_frame('payType')">
-            <div class="name">支付方式管理</div>
+        <div class="item" @click="payTypePage()">
+            <div class="name">收款信息管理</div>
             <div class="arrow"></div>
         </div>
         <div class="item" onclick="$A.check_version(true)">
@@ -97,6 +97,14 @@
                     $A.change_frame('user_setup_auth_submit')
                 }
             },
+            payTypePage:function() {
+              if (this.idcardauth>0){
+                  $A.change_frame('payType');
+              }else{
+                  $A.toast('請先通過實名認證!');
+                  $A.change_frame('user_setup_auth_submit');
+              }
+            }
         }
     })
     $('#app').height($A.get_body_height())

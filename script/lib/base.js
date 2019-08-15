@@ -3,9 +3,9 @@
  * */
 
 $A = {};
-$A.domname = 'http://api.dbsex.sg'
+$A.domname = 'https://api.dbsex.net'
 $A.url = $A.domname + '/aapi/';
-$A.upload_url = 'http://api.dbsex.sg';
+$A.upload_url = 'https://api.dbsex.net';
 $A.dev_model = 1        //0,开发      1,上线
 
 /**
@@ -21,6 +21,7 @@ $A.request = function (url, params, success_call_back, pre_do_call_back, file, i
     if (!params) {
         params = {}
     }
+    // console.log(url);
     var cache_key = 'request_data#' + url
 
     // 获取上次请求数据
@@ -48,7 +49,7 @@ $A.request = function (url, params, success_call_back, pre_do_call_back, file, i
     }
 
     var group = url.split('/')[0]
-    if (group === 'finance' || group === 'user' || url === 'trade/submit' || url === 'trade/get_list' || url === 'trade/repeal') {
+    if (group === 'finance' || group === 'user' || url === 'trade/submit' || url === 'trade/get_list' || url === 'trade/repeal'|| url === 'otc') {
         var token = api.getPrefs({
             sync: true,
             key: 'token'
@@ -59,6 +60,7 @@ $A.request = function (url, params, success_call_back, pre_do_call_back, file, i
             }, '當前請求,必須得請先進行登錄操作!')
             return
         }
+        // console.log(token);
         params.token = token
     }
 

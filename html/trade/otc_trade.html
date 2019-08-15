@@ -197,6 +197,7 @@
         .myadv {
             font-size: 14px;
             margin-top: 25px;
+            margin-bottom: 50px;
         }
 
         .input-box {
@@ -270,107 +271,110 @@
         <header id="pack" class="aui-bar aui-bar-nav com_head">
             <div class="back_but" tapmode onclick="$A.closeWin('trade/otc_trade')"></div>
             <div class="aui-title titlePack title">
-                <span :class="{'active':cur==0}" @click="change_type(0)">我要买</span>
-                <span :class="{'active':cur==1}" @click="change_type(1)">我要卖</span>
+                <span :class="{'active':cur==0}" @click="change_type(0)">我要買</span>
+                <span :class="{'active':cur==1}" @click="change_type(1)">我要賣</span>
             </div>
             <span class="aui-pull-right aui-iconfont aui-icon-cert" @click="orderList()" style="font-size:22px;"></span>
         </header>
 
         <div v-show="cur==0">
             <div class="coin_type">
-                <div class="item_coin b" :class="{'active':coinType==0}" @click="change_coin(0)">ETH</div>
-                <div class="item_coin b" :class="{'active':coinType==1}" @click="change_coin(1)">BTC</div>
-                <div class="item_coin b" :class="{'active':coinType==2}" @click="change_coin(2)">DBC</div>
+                <div v-for="item in buyCoinList" class="item_coin b" :class="{'active':coinType==item.name}" @click="change_coin(item.name)">{{item.name}}</div>
             </div>
             <div id="otcList" style="overflow: auto">
-                <div class="coin_list">
-                    <div class="item" v-for="item in 10">
+                <div v-if="list.length>0" class="coin_list">
+                    <div class="item" v-for="item in list">
                         <div class="top flex-box-between">
-                            <div class="b"><img src="../../images/user.png" alt="" class="userImg">长大抢小米</div>
-                            <div class="gray">16783 | 99%</div>
+                            <div class="b"><img :src="item.head_img?item.head_img:'../../images/user.png'" alt="" class="userImg">{{item.truename}}</div>
+                            <!-- <div class="gray">16783 | 99%</div> -->
                         </div>
                         <div class="middle flex-box-between">
                             <div class="gray">
-                                <div>数量 0.133005 BTC</div>
-                                <div>限额 ¥1000.00 - ¥4661.00</div>
+                                <div>數量 {{item.balance}} {{item.coin_name}}</div>
+                                <div>限額 ¥{{item.limit_min}} - ¥{{item.limit_max}}</div>
                             </div>
                             <div class="gray tx-r">
-                                <div>单价</div>
-                                <div class="bigSize">¥69206.00</div>
+                                <div>單價</div>
+                                <div class="bigSize">¥{{item.price}}</div>
                             </div>
                         </div>
                         <div class="last flex-box-between">
-                            <div><img src="../../css/img/wx.png" alt="" class="payIcon"><img src="../../css/img/yhcard.png" alt="" class="payIcon"><img src="../../css/img/alipay.png" alt="" class="payIcon"></div>
-                            <div class="buyCoin" @click="buyCoin">购买</div>
+                            <div><img v-if="item.pay_bank" src="../../css/img/yhcard.png" alt="" class="payIcon"><img v-if="item.pay_alipay" src="../../css/img/alipay.png" alt="" class="payIcon"></div>
+                            <div class="buyCoin" @click="buyCoin(item)">購買</div>
                         </div>
                     </div>
                 </div>
+                <div v-show="list.length==0" class="no_data">
+                    <img src="../../images/no_data.png" alt="">
+                    <p>暫無數據...</p>
+                </div>
             </div>
+
         </div>
         <div v-show="cur==1" class="sale_box">
             <div class="choose_coin margin-b-15">
-                <div class="item" v-for="(item,index) in coninList">
-                    <div class="con" :class="{'active':coinId==index}" @click="chooseCoin(index,item.name)">
+                <div class="item" v-for="(item,index) in coinList">
+                    <div class="con" :class="{'active':coinId==item.name}" @click="chooseCoin(item)">
                         <img :src="item.img" onerror="this.src=image_load_error">
                         <span v-text="item.name"></span>
                     </div>
                 </div>
                 <div class="c"></div>
             </div>
-            <div class="flex-box-between input-row"><label class="fs14">参考价格</label>
-                <div>1 {{coinName}}≈6.98 CNY</div>
+            <div class="flex-box-between input-row"><label class="fs14">參考價格</label>
+                <div>1 {{coinName}}≈{{coinPrice}} CNY</div>
             </div>
             <div class="input-row sellRow">
-                <label class="fs14">交易单价 CNY</label>
+                <label class="fs14">交易單價 CNY</label>
                 <div class="input-box">
-                    <input type="number" v-model="price" placeholder="请输入单价" class="flex-con">
+                    <input type="number" v-model="price" placeholder="請輸入單價" class="flex-con">
                 </div>
             </div>
             <div class="input-row">
-                <label class="fs14">交易数量 {{coinName}}</label>
+                <label class="fs14">交易數量 {{coinName}}</label>
                 <div class="input-box flex-box-between">
-                    <input type="number" v-model="num" placeholder="请输入数量" class="flex-con">
-                    <div class="blue all">全部</div>
+                    <input type="number" v-model="num" placeholder="請輸入數量" class="flex-con">
+                    <div class="blue all" @click="allPush">全部</div>
                 </div>
             </div>
             <div class="input-row">
-                <label class="fs14">最小单笔限额 CNY</label>
+                <label class="fs14">最小單筆限額 CNY</label>
                 <div class="input-box flex-box-between">
-                    <input type="number" v-model="minPrice" placeholder="最小单笔限额：100" class="flex-con">
+                    <input type="number" v-model="minPrice" placeholder="最小單筆限額" class="flex-con">
                     <div class="coinName fs14">0.00{{coinName}}</div>
                 </div>
             </div>
             <div class="input-row">
-                <label class="fs14">最大单笔限额 CNY</label>
+                <label class="fs14">最大單筆限額 CNY</label>
                 <div class="input-box flex-box-between">
-                    <input type="number" v-model="maxPrice" placeholder="最大单笔限额：5000" class="flex-con">
+                    <input type="number" v-model="maxPrice" placeholder="最大單筆限額" class="flex-con">
                     <div class="coinName fs14">0.00{{coinName}}</div>
                 </div>
             </div>
             <div class="input-row">
-                <label class="fs14">交易密码</label>
+                <label class="fs14">交易密碼</label>
                 <div class="input-box flex-box-between">
-                    <input type="password" v-model="pwd" placeholder="请输入交易密码" class="flex-con">
+                    <input type="password" v-model="pwd" placeholder="請輸入交易密碼" class="flex-con">
                 </div>
             </div>
             <div class="input-row">
-                <label class="fs14">请选择支付方式</label>
+                <label class="fs14">請選擇收款方式</label>
                 <div class="payBox">
-                    <div class="item flex-box-between">
-                        <label for="card"><div>银行卡</div><div><span class="userName">夏伟</span>***379</div></label>
-                        <input type="radio" name="travel" class="radio_type" value="item.id" checked="" id="card">
+                    <div v-if="payList&&payList.bank" class="item flex-box-between">
+                        <label for="card"><div>銀行卡</div><div><span class="userName">{{payList.bank.true_name}}</span>{{payList.bank.card}}</div></label>
+                        <input type="checkbox" name="travel" class="radio_type" id="card" v-model="bankPay">
                     </div>
-                    <div class="item flex-box-between">
-                        <label for="zfb"><div>支付宝</div><div><span class="userName">夏伟</span>***379@qq.com</div></label>
-                        <input type="radio" name="travel" class="radio_type" value="item.id" id="zfb">
+                    <div v-if="payList&&payList.alipay" class="item flex-box-between">
+                        <label for="zfb"><div>支付寶</div><div><span class="userName">{{payList.alipay.true_name}}</span>{{payList.alipay.account}}</div></label>
+                        <input type="checkbox" name="travel" class="radio_type" id="zfb" v-model="aliPay">
                     </div>
                 </div>
             </div>
             <div class="tx-c  margin-b-10  margin-t-15">
-                <button class="aui-btn clickOrder" type="button" :disabled="num==''||price==''||pwd==''">卖出</button>
+                <button class="aui-btn clickOrder" type="button" @click="sellCoin">賣出</button>
             </div>
 
-            <div class="tx-c myadv blue" onclick="$A.openWin('trade/myAdv')">我的广告</div>
+            <div class="tx-c myadv blue" @click="myAdv()">我的廣告</div>
         </div>
 
     </div>
@@ -385,41 +389,110 @@
             el: "#app",
             data: {
                 cur: 0,
-                coinType: 0,
-                coninList: [],
-                coinId: 0,
+                coinType:'',
+                coinList: [],
+                coinId: '',
                 price: '',
-                num: '',
+                num: 0.00,
                 pwd: '',
                 minPrice:'',
                 maxPrice:'',
-                coinName: 'USDT'
+                coinName: '',
+                coinPrice:'',
+                userBalance:0,
+                payList:{},
+                bankPay:false,
+                aliPay:false,
+                page:1,
+                list:[],
+                buyCoinList:[],
+                no_more: false       //是否有更多可以加载
             },
             mounted: function() {
                 var $this = this;
                 setTimeout(function() {
-                    $this.get_data()
+                    $this.get_data();
+                      $this.getList();
                     set_scroll_div();
+                    api.addEventListener({
+                        name: 'changeOtcOrder'
+                    }, function(ret, err) {
+                        $this.list = [];
+                        $this.page = 1;
+                        $this.no_more=false;
+                          $this.getList();
+                    });
                 }, 600)
             },
             methods: {
-                // 请求拉取数据
+                //列表
+                getList:function () {
+                  var $this = this;
+                  var tokens = api.getPrefs({
+                      sync: true,
+                      key: 'token'
+                  });
+                  var params = {
+                      token: tokens,
+                      coin_name: $this.coinType,
+                      page: $this.page,
+                  }
+                  if ($this.no_more) {
+                      return
+                  }
+                  $A.request('otc/get_all_list', params, function (data) {
+                      if (data.length === 0) {
+                          $this.no_more = true;
+                          //$A.toast('没有数据了...')
+                          return
+                      }
+                      $.each(data, function (i, obj) {
+                          $this.list.push(obj)
+                      })
+                      $this.page += 1
+                      $this.$forceUpdate()
+                      $('#otcList').height($this.list.length * 160)
+                  })
+                },
+                // 请求卖单拉取数据
                 get_data: function() {
                     var $this = this;
                     var set_data = function(data) {
-                        $this.coninList = data;
-                        $this.coinName = data[0].name;
+                        $this.coinList = data.coin_list;
+                        $this.buyCoinList = data.coin_list;
+                        $this.payList = data.pay_list;
+                        $this.coinPrice = Object.values(data.coin_list)[0].cny;
+                        $this.coinName = Object.values(data.coin_list)[0].name;
+                        $this.coinId = Object.values(data.coin_list)[0].name;
+                        $this.coinType = Object.values(data.coin_list)[0].name;
+                        $this.num = Object.values(data.coin_list)[0].balance;
+                        $this.userBalance = Object.values(data.coin_list)[0].balance;
                         // $this.$forceUpdate()
                     }
-                    $A.request('finance/coin_list', {}, set_data, set_data)
+                    var tokens = api.getPrefs({
+                        sync: true,
+                        key: 'token'
+                    });
+                    var params = {
+                        token: tokens
+                    };
+                    $A.request('otc/sale', params, set_data, set_data)
+                },
+                allPush:function() {
+                  this.num = this.userBalance;
                 },
                 change_type: function(type) {
                     this.cur = type;
                 },
                 change_coin: function(type) {
                     this.coinType = type;
+                    this.list = [];
+                    this.page = 1;
+                    this.no_more=false;
+                    // $('#otcList').height(0)
+                    this.getList()
                 },
-                buyCoin: function() {
+                buyCoin: function(item) {
                     api.openFrame({
                         name: 'buybox',
                         url: 'buybox.html',
@@ -435,6 +508,9 @@
                             duration: 300 //动画过渡时间，默认300毫秒
                         },
                         bounces: false,
+                        pageParam: {
+                            coin: item
+                        },
                         bgColor: 'rgba(43,43,43,0.5)'
                     });
                 },
@@ -444,9 +520,64 @@
                         url: '../trade/orderList.html'
                     });
                 },
-                chooseCoin: function(ids, name) {
-                    this.coinId = ids;
-                    this.coinName = name;
+                chooseCoin: function(coin) {
+                    this.coinId = coin.name;
+                    this.coinName = coin.name;
+                    this.coinPrice = coin.cny;
+                    this.num = coin.balance;
+                    this.userBalance = coin.balance;
+                },
+                sellCoin:function () {
+                  var $this = this;
+                  var tokens = api.getPrefs({
+                      sync: true,
+                      key: 'token'
+                  });
+                  if($this.price==''){
+                    $A.toast('請填寫交易單價');
+                    return false;
+                  }else if($this.num==''){
+                    $A.toast('請填寫交易數量');
+                    return false;
+                  }else if($this.minPrice==''){
+                    $A.toast('請填寫最小單筆限額');
+                    return false;
+                  }else if($this.maxPrice==''){
+                    $A.toast('請填寫最大單筆限額');
+                    return false;
+                  }else if($this.pwd==''){
+                    $A.toast('請填寫交易密碼');
+                    return false;
+                  }else if(!$this.bankPay&&!$this.aliPay){
+                    $A.toast('請至少選擇壹種支付方式');
+                    return false;
+                  }else{
+                    var params = {
+                        token: tokens,
+                        price: $this.price,
+                        amount: $this.num,
+                        limit_min: $this.minPrice,
+                        limit_max: $this.maxPrice,
+                        pay_password: $this.pwd,
+                        coin_name: $this.coinName,
+                        is_bank: Number($this.bankPay),
+                        is_alipay: Number($this.aliPay),
+                    };
+                    $A.request('otc/sale_handle', params, function(data) {
+                          $A.toast('發布成功');
+                          $this.price='';
+                          $this.num='';
+                          $this.minPrice='';
+                          $this.maxPrice='';
+                          $this.change_type(0);
+                    })
+                  }
+                },
+                myAdv:function () {
+                  api.openFrame({
+                      name: 'myAdv',
+                      url: '../trade/myAdv.html'
+                  });
                 }
             }
         })
@@ -465,7 +596,7 @@
             var clientHeight = document.getElementById(ID).clientHeight;
             if (scrollHeight - clientHeight === scrollTop) {
                 //滚动条滚到最底部
-                // app.getData()
+                app.getList()
             }
         };
     }

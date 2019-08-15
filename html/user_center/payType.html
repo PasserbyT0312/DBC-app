@@ -20,7 +20,6 @@
             background: #fff;
         }
 
-
         .aui-bar-nav .aui-btn .aui-iconfont {
             color: #8F9EAB;
             font-weight: bold;
@@ -59,21 +58,31 @@
         <!--头部标题-->
         <div class="com_head blue">
             <div class="back_but" onclick="$A.change_frame('user_setup_index')"></div>
-            <div class="title">支付方式管理</div>
+            <div class="title">收款信息管理</div>
         </div>
         <div id="orderList" class="orderList" style="overflow: auto">
-            <div class="item" v-for="item in orderList" @click="bindFor(item)">
+            <div class="item"  @click="bindFor(0)">
                 <div class="flex-box-between">
-                    <div class="orderStatus blue">{{item.name}}</div>
-                    <div class="gray">{{payStatus[item.status]}} <span v-if="item.account==''" class="aui-iconfont aui-icon-right"></span></div>
+                    <div class="orderStatus blue">{{pay_bank?pay_bank.bank_name:'銀行卡'}}</div>
+                    <div class="gray">{{pay_bank?'':'未綁定'}} <span v-if="!pay_bank" class="aui-iconfont aui-icon-right"></span></div>
                 </div>
-                <div v-if="item.account!=''" class="title aui-margin-b-10 aui-margin-t-15">
-                    {{item.userName}}
+                <div v-if="pay_bank" class="title aui-margin-b-10 aui-margin-t-15">
+                    {{pay_bank.ture_name}}
                 </div>
-                <div v-if="item.account!=''" class="blue userName">{{item.account}}</div>
+                <div v-if="pay_bank" class="blue userName">{{pay_bank.card}}</div>
+            </div>
+            <div  class="item"  @click="bindFor(1)">
+                <div class="flex-box-between">
+                    <div class="orderStatus blue">支付寶</div>
+                    <div class="gray">{{pay_alipay?'':'未綁定'}} <span v-if="!pay_alipay" class="aui-iconfont aui-icon-right"></span></div>
+                </div>
+                <div v-if="pay_alipay" class="title aui-margin-b-10 aui-margin-t-15">
+                    {{pay_alipay.ture_name}}
+                </div>
+                <div v-if="pay_alipay" class="blue userName">{{pay_alipay.account}}</div>
             </div>
         </div>
-
+    </div>
 </body>
 
 <script type="text/javascript" src="../../script/lib/api.js"></script>
@@ -82,55 +91,56 @@
 <script type="text/javascript" src="../../script/lib/vue.js"></script>
 <script>
     var app = new Vue({
-            el: "#app",
-            data: {
-                payStatus: ['未綁定', ''],
-                orderList: [{
-                    id: 1,
-                    status: 0,
-                    name: '中国银行',
-                    type:0,
-                    userName: '赵小米',
-                    account: '6200 0000 0158 0522 385',
-                }, {
-                    id: 2,
-                    status: 0,
-                    name: '支付寶',
-                    type:1,
-                    userName: '赵小米',
-                    account: '',
-                }],
+        el: "#app",
+        data: {
+            pay_bank:'',
+            pay_alipay:'',
+            account:''
+        },
+        mounted: function() {
+            var $this = this;
+
+            setTimeout(function () {
+                $this.getType();
+                 api.addEventListener({
+                     name: 'changePay'
+                 }, function(ret, err) {
+                        $this.getType();
+                 });
+            }, 600)
+        },
+        methods: {
+            bindFor: function(type) {
+              if (type==0&&!this.pay_bank) {
+                  api.openFrame({
+                      name: 'bindCard',
+                      url: '../user_center/bindCard.html',
+                      pageParam: {
+                          account: this.account
+                      }
+                  });
+              }
+              if(type==1&&!this.pay_alipay){
+                  api.openFrame({
+                      name: 'bindCard',
+                      url: '../user_center/bindAliPay.html',
+                      pageParam: {
+                          account: this.account
+                      }
+                  });
+              }
             },
-            mounted: function () {
-
-
-
-            },
-            methods: {
-                bindFor: function(oid) {
-                    if (oid.status == 0) {
-                        if(oid.type==0){
-                          $A.change_frame('bindCard');
-                        }else{
-                          $A.change_frame('bindAliPay');
-                        }
-                    }
-
-                },
-                undoOrder: function() {
-                    api.confirm({
-                        title: '撤销广告',
-                        msg: '您确认要进行该操作么？',
-                        buttons: ['確定', '取消']
-                    }, function(ret, err) {
-                        if (ret.buttonIndex === 2) {
-                            return;
-                        }
-                        api.closeFrame({});
-                    })
-                },
+            getType: function() {
+                var $this = this;
+                $A.request('user/get_pay_info', {}, function(data) {
+                    // console.log(JSON.stringify(data));
+                    $this.pay_bank = data.pay_bank;
+                    $this.pay_alipay = data.pay_alipay;
+                    $this.account = data.true_name;
+                })
             }
-        })
+        }
+    })
 </script>
 
 </html>

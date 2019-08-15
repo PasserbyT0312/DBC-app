@@ -95,28 +95,29 @@
             我的广告
         </div> -->
         <header id="pack" class="aui-bar aui-bar-nav com_head">
-            <div class="back_but" tapmode onclick="$A.closeWin('trade/myAdv')"></div>
-              <div class="aui-title">我的广告</div>
+            <div class="back_but" tapmode onclick="closeFrame()"></div>
+              <div class="aui-title">我的廣告</div>
         </header>
         <div id="orderList" class="orderList" style="overflow: auto">
             <div class="item" v-for="item in orderList">
                 <div class="flex-box-between aui-margin-b-15">
-                    <div class="orderStatus blue">{{item.coin}}</div>
-                    <div class="blue">{{orderStatus[item.status]}} <span class="aui-iconfont aui-icon-right"></span></div>
+                    <div class="orderStatus blue">{{item.coin_name}}</div>
+                    <div v-if="item.status==3" class="blue">掛賣中</div>
+                    <div v-else class="blue">已撤銷</div>
                 </div>
                 <div class="aui-row ordername aui-margin-b-10">
-                    <div class="aui-col-xs-4">总数量(BTC)</div>
-                    <div class="aui-col-xs-4 tx-c">已售数量(BTC)</div>
-                    <div class="aui-col-xs-4 tx-r">单价(CNY)</div>
+                    <div class="aui-col-xs-4">總數量({{item.coin_name}})</div>
+                    <div class="aui-col-xs-4 tx-c">已售數量({{item.coin_name}})</div>
+                    <div class="aui-col-xs-4 tx-r">單價(CNY)</div>
                 </div>
                 <div class="aui-row ordername  aui-margin-b-10">
-                    <div class="aui-col-xs-4">{{item.num}}</div>
-                    <div class="aui-col-xs-4 tx-c">{{item.num}}</div>
+                    <div class="aui-col-xs-4">{{item.amount}}</div>
+                    <div class="aui-col-xs-4 tx-c">{{item.balance}}</div>
                     <div class="aui-col-xs-4 tx-r">{{item.price}}</div>
                 </div>
                 <div class="flex-box-between">
-                    <div class="time gray">{{item.time}}</div>
-                    <div v-if="item.status==1" class="undoOrder" @click="undoOrder">撤销</div>
+                    <div class="time gray">{{item.create_time}}</div>
+                    <div v-if="item.status==3" class="undoOrder" @click="undoOrder(item.order_no)">撤銷</div>
                 </div>
             </div>
             <div v-show="orderList.length==0" class="no_data">
@@ -134,17 +135,7 @@
     var app = new Vue({
             el: "#app",
             data: {
-                orderStatus: ['已撤销', '挂卖中'],
-                orderList: [{
-                    id: 1,
-                    status: 1,
-                    sale: 0,
-                    coin: 'BTC',
-                    time: '14:22 08/17/2018',
-                    num: 0.010896,
-                    price: 500.00,
-                    username: '刚进城的村长'
-                }],
+                orderList: [],
                 page: 1,
                 no_more: false //是否有更多可以加载
             },
@@ -152,45 +143,57 @@
               var $this = this;
               setTimeout(function () {
                   //$this.list = []
-                  $this.getData();
+                  $this.getList();
                   set_scroll_div()
               }, 600)
 
             },
             methods: {
-                getData: function() {
-                    var arr = [{
-                        id: 1,
-                        status: 0,
-                        sale: 0,
-                        coin: 'BTC',
-                        time: '14:22 08/17/2018',
-                        num: 0.010896,
-                        price: 500.00,
-                        username: '刚进城的村长'
-                    }, {
-                        id: 2,
-                        status: 1,
-                        sale: 1,
-                        coin: 'BTC',
-                        time: '14:22 08/17/2018',
-                        num: 0.010896,
-                        price: 500.00,
-                        username: '刚进城的村长'
-                    }]
-                    this.orderList = this.orderList.concat(arr);
-                    // console.log(this.orderList);
-                },
-                undoOrder: function() {
+              //列表
+              getList:function () {
+                var $this = this;
+                var tokens = api.getPrefs({
+                    sync: true,
+                    key: 'token'
+                });
+                var params = {
+                    token: tokens
+                }
+                if ($this.no_more) {
+                    return
+                }
+                $A.request('otc/sale_list', params, function (data) {
+                    if (data.length === 0) {
+                        $this.no_more = true;
+                        //$A.toast('没有数据了...')
+                        return
+                    }
+                    $this.orderList = data;
+                })
+              },
+                undoOrder: function(orderNo) {
+                  var $this = this;
                     api.confirm({
-                        title: '撤销广告',
-                        msg: '您确认要进行该操作么？',
+                        title: '撤銷廣告',
+                        msg: '您確認要進行該操作麽？',
                         buttons: ['確定', '取消']
                     }, function(ret, err) {
                         if (ret.buttonIndex === 2) {
                             return;
                         }
-                        api.closeFrame({});
+                        var tokens = api.getPrefs({
+                            sync: true,
+                            key: 'token'
+                        });
+                        var params = {
+                            token: tokens,
+                            order_no: orderNo,
+                        };
+                        $A.request('otc/cancel', params, function(data) {
+                            // console.log(data);
+                            // console.log(JSON.stringify(data));
+                            $this.getList();
+                        })
                     })
                 },
             }

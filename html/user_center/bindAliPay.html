@@ -67,6 +67,10 @@
       width: 80px;
       height: 80px;
     }
+    .prompt{
+      color: red;
+      font-size: 14px;
+    }
     </style>
 </head>
 <body>
@@ -74,30 +78,31 @@
 
     <!--头部标题-->
     <div class="com_head blue">
-        <div class="back_but" onclick="$A.change_frame('payType')"></div>
+        <div class="back_but" onclick="closeFrame()"></div>
         <div class="title">綁定支付寶</div>
     </div>
     <div class="bindBox">
       <div class="input-row sellRow">
           <label class="fs14">姓名</label>
           <div class="input-box">
-              <input type="number" v-model="name" placeholder="請輸入姓名" class="flex-con">
+              <input type="text" v-model="name" placeholder="您還未實名認證" class="flex-con" readonly="">
           </div>
       </div>
       <div class="input-row">
           <label class="fs14">賬號</label>
           <div class="input-box flex-box-between">
-              <input type="number" v-model="account" placeholder="請輸入賬號" class="flex-con">
+              <input type="text" v-model="account" placeholder="請輸入賬號" class="flex-con">
           </div>
       </div>
-      <div class="input-row">
+      <div class="prompt">*為了您的資金和交易安全，請綁定和實名認證壹致的賬號信息</div>
+      <!-- <div class="input-row">
           <label class="fs14">添加收款二維碼（選填）</label>
           <div class="img_row">
               <img :src="codeImg?codeImg:'../../images/addImg.png'" @click="choose_by_album()">
           </div>
-      </div>
+      </div> -->
       <div class="tx-c">
-          <button class="aui-btn saveBind" type="button">保存</button>
+          <button class="aui-btn saveBind" type="button" @click="bindPay">保存</button>
       </div>
     </div>
 </div>
@@ -110,133 +115,35 @@
 <script type="text/javascript" src="../../script/lib/base.js"></script>
 <script type="text/javascript" src="../../script/lib/vue.js"></script>
 <script>
-    var app = new Vue({
-        el: '#app',
-        data: {
-          name:'',
-          account:'',
-          codeImg:''
-        },
-        mounted: function () {
-
-        },
-        methods: {
-            // 上传信息
-            submit: function (type) {
-                if (!(this.idcard.length === 18 || this.idcard.length === 15)) {
-                    $A.toast('【證件-號碼】錯誤')
-                    return
-                }
-                if (this.true_name.length < 2) {
-                    $A.toast('【證件-真實姓名】錯誤')
-                    return
-                }
-                // if (this.idcardimg1.length === 0) {
-                //     $A.toast('【手持證件照】-未選擇')
-                //     return
-                // }
-                if (this.idcardimg2.length === 0) {
-                    $A.toast('【證件-正面】-未選擇')
-                    return
-                }
-                if (this.idcardimg3.length === 0) {
-                    $A.toast('【證件-反面】-未選擇')
-                    return
-                }
-                var params = {
-                    idcard: this.idcard,
-                    truename: this.true_name,
-                    idcardimg1: this.idcardimg1,
-                    idcardimg2: this.idcardimg2,
-                    idcardimg3: this.idcardimg3,
-                }
-                $A.request('user/card_save', params, function (data) {
-                    api.sendEvent({
-                        name: 'auth_info_submit',
-                        extra: {
-                            status: 3
-                        }
-                    });
-                    $api.setStorage('idcardauth', 3)
-                    $A.alert('信息已經上傳,請等待系統處理通過')
-                    $A.change_frame('user_center_index')
-                })
-
-                //this.choose_by_album(type)
+    apiready = function() {
+        var app = new Vue({
+            el: '#app',
+            data: {
+                name: api.pageParam.account,
+                account: '',
             },
-            choose_by_album: function (type) {
-                var UIAlbumBrowser = api.require('UIAlbumBrowser');
-                var $this = this
-                UIAlbumBrowser.open({
-                    max: 1,
-                    styles: {
-                        bg: '#fff',
-                        mark: {
-                            icon: '',
-                            position: 'bottom_left',
-                            size: 20
-                        },
-                        nav: {
-                            bg: 'rgba(0,0,0,0.6)',
-                            titleColor: '#fff',
-                            titleSize: 18,
-                            cancelColor: '#fff',
-                            cancelSize: 16,
-                            finishColor: '#fff',
-                            finishSize: 16
-                        }
-                    },
-                    rotation: true
-                }, function (ret) {
-                    if (ret && ret.list && ret.list.length) {
-                        //$A.alert(JSON.stringify(ret))
-                        var image = ret.list[0]
-                        if ($A.isAndroid()) {
-                            $this.upload_icon(image.path, type)
-                        } else {
-                            // iOS需要路径转化
-                            UIAlbumBrowser.transPath({
-                                path: image.path
-                            }, function (ret, err) {
-                                if (ret) {
-                                    //$A.alert(JSON.stringify());
-                                    $this.upload_icon(ret.path, type)
-                                } else {
-                                    //alert(JSON.stringify(err));
-                                }
-                            });
-                        }
+            mounted: function() {
 
-
-                        //$A.alert('相册选择:' + JSON.stringify(image.path));
-                    }
-                });
             },
-
-            upload_icon: function (imagePath, type) {
-                var fileParams = {}
-                var $this = this
-                fileParams['idcardimg' + type] = imagePath
-                var fun = function (data) {
-                    $this['idcardimg' + type] = data
-                    $this['idcardimg' + type + '_local'] = imagePath
-                    $this.$forceUpdate()
-                    //$A.toast('上传成功')
-                    //$A.alert('上传完毕:' + $A.domname + $this['idcardimg' + type]);
+            methods: {
+                bindPay:function() {
+                  var $this = this;
+                  var params = {
+                      account: $this.account
+                  };
+                  $A.request('user/binding_alipay', params, function(data) {
+                        $A.toast('添加成功');
+                        api.sendEvent({
+                            name: 'changePay',
+                        });
+                        closeFrame();
+                  })
                 }
-                $A.request('user/card_upload', {
-                    token: api.getPrefs({
-                        sync: true,
-                        key: 'token'
-                    })
-                }, fun, null, fileParams)
             }
+        })
+    }
 
 
-        }
-    })
 
-    $(function () {
-        $('.auth_submit_page').css('minHeight', $A.get_body_height() + 'px')
-    })
+
 </script>

@@ -73,6 +73,10 @@
             width: 80px;
             height: 80px;
         }
+        .prompt{
+          color: red;
+          font-size: 14px;
+        }
     </style>
 </head>
 
@@ -81,14 +85,14 @@
 
         <!--头部标题-->
         <div class="com_head blue">
-            <div class="back_but" onclick="$A.change_frame('payType')"></div>
+            <div class="back_but" onclick="closeFrame()"></div>
             <div class="title">綁定銀行卡</div>
         </div>
         <div class="bindBox">
             <div class="input-row sellRow">
                 <label class="fs14">开户银行</label>
-                <div class="input-box"  @click="bankList">
-                  <input type="text" v-model="bankName" placeholder="請选择开户银行" class="flex-con" readonly>
+                <div class="input-box" @click="bankList">
+                    <input type="text" v-model="bankName" placeholder="請选择开户银行" class="flex-con" readonly>
                 </div>
             </div>
             <div class="input-row">
@@ -100,11 +104,12 @@
             <div class="input-row sellRow">
                 <label class="fs14">姓名</label>
                 <div class="input-box">
-                    <input type="number" v-model="name" placeholder="" disabled class="flex-con">
+                    <input type="text" v-model="name" placeholder="您還未實名認證" readonly class="flex-con">
                 </div>
             </div>
+            <div class="prompt">*為了您的資金和交易安全，請綁定和實名認證壹致的賬號信息</div>
             <div class="tx-c">
-                <button class="aui-btn saveBind" type="button" >保存</button>
+                <button class="aui-btn saveBind" type="button" @click="bindPay">保存</button>
             </div>
         </div>
     </div>
@@ -118,197 +123,578 @@
 <script type="text/javascript" src="../../script/lib/base.js"></script>
 <script type="text/javascript" src="../../script/lib/vue.js"></script>
 <script>
-    var app = new Vue({
-        el: '#app',
-        data: {
-            name: '',
-            account: '',
-            bankName: '',
-            list:[{
-                name: '中国银行',
-                phone: 123
-            }, {
-                name: '光大银行',
-                phone: 456
-            }, {
-                name: '建设银行',
-                phone: 5555
-            }]
-        },
-        mounted: function() {
-
-        },
-        methods: {
-            bankList: function() {
-                var UIActionSelector = api.require('UIActionSelector');
-                UIActionSelector.open({
-                    datas: app.list,
-                    layout: {
-                        row: 5,
-                        col: 1,
-                        height: 30,
-                        size: 16,
-                        sizeActive: 18,
-                        rowSpacing: 10,
-                        colSpacing: 10,
-                        maskBg: 'rgba(0,0,0,0.4)',
-                        bg: '#fff',
-                        color: '#888',
-                        colorActive: '#000',
-                        colorSelected: '#000'
-                    },
-                    animation: true,
-                    cancel: {
-                        text: '取消',
-                        size: 16,
-                        w: 90,
-                        h: 35,
-                        bg: '#fff',
-                        bgActive: '#ccc',
-                        color: '#999',
-                        colorActive: '#fff'
-                    },
-                    ok: {
-                        text: '确定',
-                        size: 14,
-                        w: 90,
-                        h: 35,
-                        bg: '#fff',
-                        bgActive: '#ccc',
-                        colorActive: '#fff'
-                    },
-                    title: {
-                        text: '',
-                        size: 12,
-                        h: 44,
-                        bg: '#fff',
-                        color: '#888'
-                    },
-                    selectorDividerColor: '#fff',
-                    selectedBold: false,
-                    // fixedOn: api.frameName
-                }, function(ret, err) {
-                    if (ret.eventType == 'ok') {
-                        app.bankName = ret.selectedInfo[0].name;
-                    }
-                });
+    apiready = function() {
+        var app = new Vue({
+            el: '#app',
+            data: {
+                name: api.pageParam.account,
+                account: '',
+                bankName: '',
             },
-            // 上传信息
-            submit: function(type) {
-                if (!(this.idcard.length === 18 || this.idcard.length === 15)) {
-                    $A.toast('【證件-號碼】錯誤')
-                    return
-                }
-                if (this.true_name.length < 2) {
-                    $A.toast('【證件-真實姓名】錯誤')
-                    return
-                }
-                // if (this.idcardimg1.length === 0) {
-                //     $A.toast('【手持證件照】-未選擇')
-                //     return
-                // }
-                if (this.idcardimg2.length === 0) {
-                    $A.toast('【證件-正面】-未選擇')
-                    return
-                }
-                if (this.idcardimg3.length === 0) {
-                    $A.toast('【證件-反面】-未選擇')
-                    return
-                }
-                var params = {
-                    idcard: this.idcard,
-                    truename: this.true_name,
-                    idcardimg1: this.idcardimg1,
-                    idcardimg2: this.idcardimg2,
-                    idcardimg3: this.idcardimg3,
-                }
-                $A.request('user/card_save', params, function(data) {
-                    api.sendEvent({
-                        name: 'auth_info_submit',
-                        extra: {
-                            status: 3
+            mounted: function() {
+
+            },
+            methods: {
+                bankList: function() {
+                    var UIActionSelector = api.require('UIActionSelector');
+                    UIActionSelector.open({
+                        datas: bankList,
+                        layout: {
+                            row: 5,
+                            col: 1,
+                            height: 30,
+                            size: 16,
+                            sizeActive: 18,
+                            rowSpacing: 10,
+                            colSpacing: 10,
+                            maskBg: 'rgba(0,0,0,0.4)',
+                            bg: '#fff',
+                            color: '#888',
+                            colorActive: '#000',
+                            colorSelected: '#000'
+                        },
+                        animation: true,
+                        cancel: {
+                            text: '取消',
+                            size: 16,
+                            w: 90,
+                            h: 35,
+                            bg: '#fff',
+                            bgActive: '#ccc',
+                            color: '#999',
+                            colorActive: '#fff'
+                        },
+                        ok: {
+                            text: '确定',
+                            size: 14,
+                            w: 90,
+                            h: 35,
+                            bg: '#fff',
+                            bgActive: '#ccc',
+                            colorActive: '#fff'
+                        },
+                        title: {
+                            text: '',
+                            size: 12,
+                            h: 44,
+                            bg: '#fff',
+                            color: '#888'
+                        },
+                        selectorDividerColor: '#fff',
+                        selectedBold: false,
+                        // fixedOn: api.frameName
+                    }, function(ret, err) {
+                        if (ret.eventType == 'ok') {
+                            app.bankName = ret.selectedInfo[0].name;
                         }
                     });
-                    $api.setStorage('idcardauth', 3)
-                    $A.alert('信息已經上傳,請等待系統處理通過')
-                    $A.change_frame('user_center_index')
-                })
+                },
+                bindPay:function() {
 
-                //this.choose_by_album(type)
-            },
-            choose_by_album: function(type) {
-                var UIAlbumBrowser = api.require('UIAlbumBrowser');
-                var $this = this
-                UIAlbumBrowser.open({
-                    max: 1,
-                    styles: {
-                        bg: '#fff',
-                        mark: {
-                            icon: '',
-                            position: 'bottom_left',
-                            size: 20
-                        },
-                        nav: {
-                            bg: 'rgba(0,0,0,0.6)',
-                            titleColor: '#fff',
-                            titleSize: 18,
-                            cancelColor: '#fff',
-                            cancelSize: 16,
-                            finishColor: '#fff',
-                            finishSize: 16
-                        }
-                    },
-                    rotation: true
-                }, function(ret) {
-                    if (ret && ret.list && ret.list.length) {
-                        //$A.alert(JSON.stringify(ret))
-                        var image = ret.list[0]
-                        if ($A.isAndroid()) {
-                            $this.upload_icon(image.path, type)
-                        } else {
-                            // iOS需要路径转化
-                            UIAlbumBrowser.transPath({
-                                path: image.path
-                            }, function(ret, err) {
-                                if (ret) {
-                                    //$A.alert(JSON.stringify());
-                                    $this.upload_icon(ret.path, type)
-                                } else {
-                                    //alert(JSON.stringify(err));
-                                }
-                            });
-                        }
-
-
-                        //$A.alert('相册选择:' + JSON.stringify(image.path));
-                    }
-                });
-            },
-
-            upload_icon: function(imagePath, type) {
-                var fileParams = {}
-                var $this = this
-                fileParams['idcardimg' + type] = imagePath
-                var fun = function(data) {
-                    $this['idcardimg' + type] = data
-                    $this['idcardimg' + type + '_local'] = imagePath
-                    $this.$forceUpdate()
-                        //$A.toast('上传成功')
-                        //$A.alert('上传完毕:' + $A.domname + $this['idcardimg' + type]);
+                  var $this = this;
+                  var params = {
+                      bank_name: $this.bankName,
+                      card: $this.account
+                  };
+                  $A.request('user/binding_bank_info', params, function(data) {
+                        $A.toast('添加成功');
+                        api.sendEvent({
+                            name: 'changePay',
+                        });
+                        closeFrame();
+                  })
                 }
-                $A.request('user/card_upload', {
-                    token: api.getPrefs({
-                        sync: true,
-                        key: 'token'
-                    })
-                }, fun, null, fileParams)
             }
-
-
-        }
-    })
-
-    $(function() {
-        $('.auth_submit_page').css('minHeight', $A.get_body_height() + 'px')
-    })
+        })
+    }
+    var bankList = [{
+        "name": "国家开发银行",
+        "text": "国家开发银行"
+    }, {
+        "name": "中国工商银行",
+        "text": "中国工商银行"
+    }, {
+        "name": "中国农业银行",
+        "text": "中国农业银行"
+    }, {
+        "name": "中国银行",
+        "text": "中国银行"
+    }, {
+        "name": "中国建设银行",
+        "text": "中国建设银行"
+    }, {
+        "name": "中国邮政储蓄银行",
+        "text": "中国邮政储蓄银行"
+    }, {
+        "name": "交通银行",
+        "text": "交通银行"
+    }, {
+        "name": "招商银行",
+        "text": "招商银行"
+    }, {
+        "name": "上海浦东发展银行",
+        "text": "上海浦东发展银行"
+    }, {
+        "name": "兴业银行",
+        "text": "兴业银行"
+    }, {
+        "name": "华夏银行",
+        "text": "华夏银行"
+    }, {
+        "name": "广东发展银行",
+        "text": "广东发展银行"
+    }, {
+        "name": "中国民生银行",
+        "text": "中国民生银行"
+    }, {
+        "name": "中信银行",
+        "text": "中信银行"
+    }, {
+        "name": "中国光大银行",
+        "text": "中国光大银行"
+    }, {
+        "name": "恒丰银行",
+        "text": "恒丰银行"
+    }, {
+        "name": "浙商银行",
+        "text": "浙商银行"
+    }, {
+        "name": "渤海银行",
+        "text": "渤海银行"
+    }, {
+        "name": "平安银行",
+        "text": "平安银行"
+    }, {
+        "name": "上海农村商业银行",
+        "text": "上海农村商业银行"
+    }, {
+        "name": "玉溪市商业银行",
+        "text": "玉溪市商业银行"
+    }, {
+        "name": "尧都农商行",
+        "text": "尧都农商行"
+    }, {
+        "name": "北京银行",
+        "text": "北京银行"
+    }, {
+        "name": "上海银行",
+        "text": "上海银行"
+    }, {
+        "name": "江苏银行",
+        "text": "江苏银行"
+    }, {
+        "name": "杭州银行",
+        "text": "杭州银行"
+    }, {
+        "name": "南京银行",
+        "text": "南京银行"
+    }, {
+        "name": "宁波银行",
+        "text": "宁波银行"
+    }, {
+        "name": "徽商银行",
+        "text": "徽商银行"
+    }, {
+        "name": "长沙银行",
+        "text": "长沙银行"
+    }, {
+        "name": "成都银行",
+        "text": "成都银行"
+    }, {
+        "name": "重庆银行",
+        "text": "重庆银行"
+    }, {
+        "name": "大连银行",
+        "text": "大连银行"
+    }, {
+        "name": "南昌银行",
+        "text": "南昌银行"
+    }, {
+        "name": "福建海峡银行",
+        "text": "福建海峡银行"
+    }, {
+        "name": "汉口银行",
+        "text": "汉口银行"
+    }, {
+        "name": "温州银行",
+        "text": "温州银行"
+    }, {
+        "name": "青岛银行",
+        "text": "青岛银行"
+    }, {
+        "name": "台州银行",
+        "text": "台州银行"
+    }, {
+        "name": "嘉兴银行",
+        "text": "嘉兴银行"
+    }, {
+        "name": "常熟农村商业银行",
+        "text": "常熟农村商业银行"
+    }, {
+        "name": "南海农村信用联社",
+        "text": "南海农村信用联社"
+    }, {
+        "name": "常州农村信用联社",
+        "text": "常州农村信用联社"
+    }, {
+        "name": "内蒙古银行",
+        "text": "内蒙古银行"
+    }, {
+        "name": "绍兴银行",
+        "text": "绍兴银行"
+    }, {
+        "name": "顺德农商银行",
+        "text": "顺德农商银行"
+    }, {
+        "name": "吴江农商银行",
+        "text": "吴江农商银行"
+    }, {
+        "name": "齐商银行",
+        "text": "齐商银行"
+    }, {
+        "name": "贵阳市商业银行",
+        "text": "贵阳市商业银行"
+    }, {
+        "name": "遵义市商业银行",
+        "text": "遵义市商业银行"
+    }, {
+        "name": "湖州市商业银行",
+        "text": "湖州市商业银行"
+    }, {
+        "name": "龙江银行",
+        "text": "龙江银行"
+    }, {
+        "name": "晋城银行",
+        "text": "晋城银行"
+    }, {
+        "name": "浙江泰隆商业银行",
+        "text": "浙江泰隆商业银行"
+    }, {
+        "name": "广东省农村信用社联合社",
+        "text": "广东省农村信用社联合社"
+    }, {
+        "name": "东莞农村商业银行",
+        "text": "东莞农村商业银行"
+    }, {
+        "name": "浙江民泰商业银行",
+        "text": "浙江民泰商业银行"
+    }, {
+        "name": "广州银行",
+        "text": "广州银行"
+    }, {
+        "name": "辽阳市商业银行",
+        "text": "辽阳市商业银行"
+    }, {
+        "name": "江苏省农村信用联合社",
+        "text": "江苏省农村信用联合社"
+    }, {
+        "name": "廊坊银行",
+        "text": "廊坊银行"
+    }, {
+        "name": "浙江稠州商业银行",
+        "text": "浙江稠州商业银行"
+    }, {
+        "name": "德阳商业银行",
+        "text": "德阳商业银行"
+    }, {
+        "name": "晋中市商业银行",
+        "text": "晋中市商业银行"
+    }, {
+        "name": "苏州银行",
+        "text": "苏州银行"
+    }, {
+        "name": "桂林银行",
+        "text": "桂林银行"
+    }, {
+        "name": "乌鲁木齐市商业银行",
+        "text": "乌鲁木齐市商业银行"
+    }, {
+        "name": "成都农商银行",
+        "text": "成都农商银行"
+    }, {
+        "name": "张家港农村商业银行",
+        "text": "张家港农村商业银行"
+    }, {
+        "name": "东莞银行",
+        "text": "东莞银行"
+    }, {
+        "name": "莱商银行",
+        "text": "莱商银行"
+    }, {
+        "name": "北京农村商业银行",
+        "text": "北京农村商业银行"
+    }, {
+        "name": "天津农商银行",
+        "text": "天津农商银行"
+    }, {
+        "name": "上饶银行",
+        "text": "上饶银行"
+    }, {
+        "name": "富滇银行",
+        "text": "富滇银行"
+    }, {
+        "name": "重庆农村商业银行",
+        "text": "重庆农村商业银行"
+    }, {
+        "name": "鞍山银行",
+        "text": "鞍山银行"
+    }, {
+        "name": "宁夏银行",
+        "text": "宁夏银行"
+    }, {
+        "name": "河北银行",
+        "text": "河北银行"
+    }, {
+        "name": "华融湘江银行",
+        "text": "华融湘江银行"
+    }, {
+        "name": "自贡市商业银行",
+        "text": "自贡市商业银行"
+    }, {
+        "name": "云南省农村信用社",
+        "text": "云南省农村信用社"
+    }, {
+        "name": "吉林银行",
+        "text": "吉林银行"
+    }, {
+        "name": "东营市商业银行",
+        "text": "东营市商业银行"
+    }, {
+        "name": "昆仑银行",
+        "text": "昆仑银行"
+    }, {
+        "name": "鄂尔多斯银行",
+        "text": "鄂尔多斯银行"
+    }, {
+        "name": "邢台银行",
+        "text": "邢台银行"
+    }, {
+        "name": "晋商银行",
+        "text": "晋商银行"
+    }, {
+        "name": "天津银行",
+        "text": "天津银行"
+    }, {
+        "name": "营口银行",
+        "text": "营口银行"
+    }, {
+        "name": "吉林农信",
+        "text": "吉林农信"
+    }, {
+        "name": "山东农信",
+        "text": "山东农信"
+    }, {
+        "name": "西安银行",
+        "text": "西安银行"
+    }, {
+        "name": "河北省农村信用社",
+        "text": "河北省农村信用社"
+    }, {
+        "name": "宁夏黄河农村商业银行",
+        "text": "宁夏黄河农村商业银行"
+    }, {
+        "name": "贵州省农村信用社",
+        "text": "贵州省农村信用社"
+    }, {
+        "name": "阜新银行",
+        "text": "阜新银行"
+    }, {
+        "name": "湖北银行黄石分行",
+        "text": "湖北银行黄石分行"
+    }, {
+        "name": "浙江省农村信用社联合社",
+        "text": "浙江省农村信用社联合社"
+    }, {
+        "name": "新乡银行",
+        "text": "新乡银行"
+    }, {
+        "name": "湖北银行宜昌分行",
+        "text": "湖北银行宜昌分行"
+    }, {
+        "name": "乐山市商业银行",
+        "text": "乐山市商业银行"
+    }, {
+        "name": "江苏太仓农村商业银行",
+        "text": "江苏太仓农村商业银行"
+    }, {
+        "name": "驻马店银行",
+        "text": "驻马店银行"
+    }, {
+        "name": "赣州银行",
+        "text": "赣州银行"
+    }, {
+        "name": "无锡农村商业银行",
+        "text": "无锡农村商业银行"
+    }, {
+        "name": "广西北部湾银行",
+        "text": "广西北部湾银行"
+    }, {
+        "name": "广州农商银行",
+        "text": "广州农商银行"
+    }, {
+        "name": "江苏江阴农村商业银行",
+        "text": "江苏江阴农村商业银行"
+    }, {
+        "name": "平顶山银行",
+        "text": "平顶山银行"
+    }, {
+        "name": "泰安市商业银行",
+        "text": "泰安市商业银行"
+    }, {
+        "name": "南充市商业银行",
+        "text": "南充市商业银行"
+    }, {
+        "name": "重庆三峡银行",
+        "text": "重庆三峡银行"
+    }, {
+        "name": "中山小榄村镇银行",
+        "text": "中山小榄村镇银行"
+    }, {
+        "name": "邯郸银行",
+        "text": "邯郸银行"
+    }, {
+        "name": "库尔勒市商业银行",
+        "text": "库尔勒市商业银行"
+    }, {
+        "name": "锦州银行",
+        "text": "锦州银行"
+    }, {
+        "name": "齐鲁银行",
+        "text": "齐鲁银行"
+    }, {
+        "name": "青海银行",
+        "text": "青海银行"
+    }, {
+        "name": "阳泉银行",
+        "text": "阳泉银行"
+    }, {
+        "name": "盛京银行",
+        "text": "盛京银行"
+    }, {
+        "name": "抚顺银行",
+        "text": "抚顺银行"
+    }, {
+        "name": "郑州银行",
+        "text": "郑州银行"
+    }, {
+        "name": "深圳农村商业银行",
+        "text": "深圳农村商业银行"
+    }, {
+        "name": "潍坊银行",
+        "text": "潍坊银行"
+    }, {
+        "name": "九江银行",
+        "text": "九江银行"
+    }, {
+        "name": "江西省农村信用",
+        "text": "江西省农村信用"
+    }, {
+        "name": "河南省农村信用",
+        "text": "河南省农村信用"
+    }, {
+        "name": "甘肃省农村信用",
+        "text": "甘肃省农村信用"
+    }, {
+        "name": "四川省农村信用",
+        "text": "四川省农村信用"
+    }, {
+        "name": "广西省农村信用",
+        "text": "广西省农村信用"
+    }, {
+        "name": "陕西信合",
+        "text": "陕西信合"
+    }, {
+        "name": "武汉农村商业银行",
+        "text": "武汉农村商业银行"
+    }, {
+        "name": "宜宾市商业银行",
+        "text": "宜宾市商业银行"
+    }, {
+        "name": "昆山农村商业银行",
+        "text": "昆山农村商业银行"
+    }, {
+        "name": "石嘴山银行",
+        "text": "石嘴山银行"
+    }, {
+        "name": "衡水银行",
+        "text": "衡水银行"
+    }, {
+        "name": "信阳银行",
+        "text": "信阳银行"
+    }, {
+        "name": "鄞州银行",
+        "text": "鄞州银行"
+    }, {
+        "name": "张家口市商业银行",
+        "text": "张家口市商业银行"
+    }, {
+        "name": "许昌银行",
+        "text": "许昌银行"
+    }, {
+        "name": "济宁银行",
+        "text": "济宁银行"
+    }, {
+        "name": "开封市商业银行",
+        "text": "开封市商业银行"
+    }, {
+        "name": "威海市商业银行",
+        "text": "威海市商业银行"
+    }, {
+        "name": "湖北银行",
+        "text": "湖北银行"
+    }, {
+        "name": "承德银行",
+        "text": "承德银行"
+    }, {
+        "name": "丹东银行",
+        "text": "丹东银行"
+    }, {
+        "name": "金华银行",
+        "text": "金华银行"
+    }, {
+        "name": "朝阳银行",
+        "text": "朝阳银行"
+    }, {
+        "name": "临商银行",
+        "text": "临商银行"
+    }, {
+        "name": "包商银行",
+        "text": "包商银行"
+    }, {
+        "name": "兰州银行",
+        "text": "兰州银行"
+    }, {
+        "name": "周口银行",
+        "text": "周口银行"
+    }, {
+        "name": "德州银行",
+        "text": "德州银行"
+    }, {
+        "name": "三门峡银行",
+        "text": "三门峡银行"
+    }, {
+        "name": "安阳银行",
+        "text": "安阳银行"
+    }, {
+        "name": "安徽省农村信用社",
+        "text": "安徽省农村信用社"
+    }, {
+        "name": "湖北省农村信用社",
+        "text": "湖北省农村信用社"
+    }, {
+        "name": "湖南省农村信用社",
+        "text": "湖南省农村信用社"
+    }, {
+        "name": "广东南粤银行",
+        "text": "广东南粤银行"
+    }, {
+        "name": "洛阳银行",
+        "text": "洛阳银行"
+    }, {
+        "name": "农信银清算中心",
+        "text": "农信银清算中心"
+    }, {
+        "name": "城市商业银行资金清算中心",
+        "text": "城市商业银行资金清算中心"
+    }]
 </script>

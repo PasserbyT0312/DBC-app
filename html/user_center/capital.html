@@ -72,10 +72,10 @@
 
 
     <div class="active-items">
-        <!-- $A.openWin('trade/otc_trade')" -->
-        <div class="item" onclick="$A.toast('功能暫未開通')">
+        <!-- $A.openWin('trade/otc_trade')" $A.toast('功能暫未開通') -->
+        <div class="item" @click="goOtc">
             <img src="../../css/img/c2c.png" alt="">
-            <div class="name">C2C交易</div>
+            <div class="name">OTC交易</div>
         </div>
         <!-- <div class="item" onclick="$A.toast('功能暫未開通')">
             <img src="../../css/img/jingcai.png" alt="">
@@ -178,6 +178,26 @@
                     $A.set_pie(arr)
                     $this.$forceUpdate()
                 }, null, null, true)
+            },
+            goOtc:function () {
+              var tokens = api.getPrefs({
+                  sync: true,
+                  key: 'token'
+              });
+              var params = {
+                  token: tokens
+              };
+              $A.request('otc/load', params, function (data) {
+                if(data==0){
+                  $A.toast('請先通過實名認證!');
+                  $A.change_frame('user_setup_auth_submit');
+                }else if(data==1){
+                  $A.toast('請先綁定收款信息!');
+                  $A.change_frame('payType')
+                }else{
+                  $A.openWin('trade/otc_trade');
+                }
+              })
             }
         }
     })

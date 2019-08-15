@@ -116,27 +116,27 @@
         <div id="farce" class="parent">
             <div class="boxTop flex-box-between">
                 <div>
-                    <div class="title b">购买BTC</div>
-                    <div>单价 <span class="blue">¥69226.00</span></div>
+                    <div class="title b">購買{{orderList.coin_name}}</div>
+                    <div>單價 <span class="blue">¥{{orderList.price}}</span></div>
                 </div>
             </div>
             <div class="boxContent">
                 <div class="flex-box margin-b-rem">
-                    <div class="buyOptions b" :class="{'active':buyType==0}" @click="changeType(0)">按价格购买</div>
-                    <div class="buyOptions b" :class="{'active':buyType==1}" @click="changeType(1)">按数量购买</div>
+                    <div class="buyOptions b" :class="{'active':buyType==0}" @click="changeType(0)">按價格購買</div>
+                    <div class="buyOptions b" :class="{'active':buyType==1}" @click="changeType(1)">按數量購買</div>
                 </div>
                 <div class="input-row flex-box-center">
-                    <input type="number" v-model="num" :placeholder="buyType==0?'请输入购买金额':'请输入购买数量'" class="flex-con">
-                    <span>{{buyType==0?'CNY':'BTC'}}</span>
-                    <div class="blue buyAll">全部买入</div>
+                    <input type="number" v-model="inputVal" :placeholder="buyType==0?'請輸入購買金額':'請輸入購買數量'" class="flex-con" @keydown="oninput">
+                    <span>{{buyType==0?'CNY':orderList.coin_name}}</span>
+                    <div class="blue buyAll" @click="buyAll">全部買入</div>
                 </div>
-                <p class="prompt gray">限额 ¥370.00 - ¥370.00</p>
-                <p class="tx-r gray">交易数量 0.000000 BTC</p>
+                <p class="prompt gray">限額 ¥{{orderList.limit_min}} - ¥{{orderList.limit_max}}</p>
+                <p class="tx-r gray">交易數量 {{buyNum}} {{orderList.coin_name}}</p>
                 <div class="flex-box-between margin-b-10">
-                    <p>实付款</p>
-                    <div class="bigSize tx-r">¥0.00</div>
+                    <p>實付款</p>
+                    <div class="bigSize tx-r">¥{{buyPrice}}</div>
                 </div>
-                <button class="aui-btn clickOrder margin-b-10" type="button" :disabled="num==''" @click="goDetail">下单</button>
+                <button class="aui-btn clickOrder margin-b-10" type="button" :disabled="buyNum==''" @click="goDetail()">下單</button>
             </div>
         </div>
     </div>
@@ -147,39 +147,100 @@
 <script type="text/javascript" src="../../script/lib/vue.js"></script>
 <script type="text/javascript">
     clickOutside('farce', 'frame');
-    var app = new Vue({
+    var app;
+    var apiready = function() {
+        var coin = api.pageParam.coin;
+        app = new Vue({
             el: "#app",
             data: {
                 buyType: 0,
-                num: 10,
-                orderList: {
-                    id: 1,
-                    status: 0,
-                    sale: 0,
-                    coin: 'BTC',
-                    time: '14:22 08/17/2018',
-                    num: 0.010896,
-                    price: 500.00,
-                    username: '刚进城的村长'
+                buyNum: 0,
+                inputVal: '',
+                buyPrice: 0.00,
+                orderList: coin
+            },
+            watch: {
+                inputVal(val, oldVal) {
+                    var inputVals = val.toString().split('.');
+                    var smallVal = inputVals[1];
+                    if (this.buyType == 0) {
+                        this.buyPrice = val;
+                        if(smallVal&&smallVal.length>8){
+                            this.buyNum = parseFloat(val/this.orderList.price).toFixed(8);
+                        }else{
+                          this.buyNum = val/this.orderList.price;
+                        }
+                    } else {
+                        this.buyNum = val;
+                        if(smallVal&&smallVal.length>8){
+                            this.buyPrice = parseFloat(val*this.orderList.price).toFixed(8);
+                        }else{
+                          this.buyPrice = val*this.orderList.price;
+                        }
+                    }
                 }
             },
             methods: {
                 changeType: function(type) {
                     this.buyType = type;
+                    if (this.buyType == 0) {
+                        this.inputVal = this.buyPrice;
+                    } else {
+                        this.inputVal = this.buyNum;
+                    }
+                },
+                oninput(e) {
+                    // 通过正则过滤小数点后8位
+                    var inputVals = e.target.value.toString().split('.');
+                    var smallVal = inputVals[1];
+                    if(smallVal&&smallVal.length>8){
+                      e.target.value = (e.target.value.match(/^\d*(\.?\d{0,8})/g)[0]) || null
+                    }
+                },
+                buyAll: function() {
+                    if (this.buyType == 0) {
+                        this.inputVal = this.orderList.price * this.orderList.balance;
+                    } else {
+                        this.inputVal = this.orderList.balance;
+                    }
+                    this.buyNum = this.orderList.balance;
+                    this.buyPrice = this.orderList.price * this.orderList.balance;
+                },
+                inputValChange: function() {
+                    this.buyPrice = this.orderList.price * this.buyNum;
+                    this.buyNum = this.buyNum;
                 },
                 goDetail: function() {
-                      api.closeFrame({});
-                    api.openFrame({
-                        name: 'orderdetail',
-                        url: '../trade/orderdetail.html',
-                        pageParam: {
-                            orderId: this.orderList
-                        }
-                    });
+                  var $this = this;
+                  var tokens = api.getPrefs({
+                      sync: true,
+                      key: 'token'
+                  });
+                  var params = {
+                      token: tokens,
+                      order_no:this.orderList.order_no,
+                      nums:this.buyNum
+                  };
+                  // console.log(this.orderList.order_no);
+                  $A.request('otc/buy_handle', params, function(data) {
+                        // console.log(data);
+                        // console.log(JSON.stringify(data));
+                        api.closeFrame({});
+                        api.openFrame({
+                            name: 'orderdetail',
+                            url: '../trade/orderdetail.html',
+                            pageParam: {
+                                orderId: data
+                            }
+                        });
+                  })
+
                 }
             }
         })
-        //点击框外删除
+    }
+
+    //点击框外删除
     function clickOutside(node, type) {
         var div = document.getElementById(node);
         $(document).click(function(event) {
@@ -197,16 +258,6 @@
                 // alert('离开')
             }
         })
-    }
-
-    //选择按钮
-    function currentClick(that) {
-
-    }
-    //产品属性
-    function getAttribute() {
-
-        api.parseTapmode();
     }
 
     function closeFrame() {
