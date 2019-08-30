@@ -140,7 +140,7 @@
                 $this.get_data()
 
                 setTimeout(function () {
-                    $this.from_page = $api.getStorage('from_page')
+                    $this.from_page = $A.getStorage('from_page')
                     var curr_height = $('#footer').height() + $('#act_box').height() + $('.com_head').height() + $A.getStatusHeight() + $A.getSafeAreaBottomHeight() + 155
                     //$A.toast(curr_height)
                     $('.coin_list').height(api.winHeight - (curr_height))
@@ -149,7 +149,7 @@
                 api.addEventListener({
                     name: 'user_center_capital_reflush'
                 }, function (ret, err) {
-                    $this.from_page = $api.getStorage('from_page')
+                    $this.from_page = $A.getStorage('from_page')
                     $this.get_data()
                     $this.$forceUpdate()
                 });
@@ -180,10 +180,7 @@
                 }, null, null, true)
             },
             goOtc:function () {
-              var tokens = api.getPrefs({
-                  sync: true,
-                  key: 'token'
-              });
+              var tokens = $A.getStorage('token');
               var params = {
                   token: tokens
               };

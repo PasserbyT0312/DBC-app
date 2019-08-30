@@ -95,8 +95,8 @@
             },
             sure: function () {
                 var $this=this
-                var type = $api.getStorage('choose_currency_type')
-                $api.setStorage('choose_currency_coin',$this.choose_data)
+                var type = $A.getStorage('choose_currency_type')
+                $A.setStorage('choose_currency_coin',JSON.stringify($this.choose_data))
 
                 switch (type) {
                     // 转出-表单

@@ -11,7 +11,7 @@ var idcardauth_class_arr=[
     'status_2',
     'status_3',
 ]
-var reference_name = '$'
+var reference_name = 'CNY'
 /**
  * 浮点运算修复异常
  * @param n

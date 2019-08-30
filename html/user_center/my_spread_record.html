@@ -84,10 +84,10 @@
 
 
                 setTimeout(function () {
-                    var curr_height= $('.com_head').height()+Number($api.getStorage('StatusBarHeight'))
+                    var curr_height= $('.com_head').height()+Number($A.getStorage('StatusBarHeight'))
                     $('#data_list').height(api.winHeight-curr_height)
 
-                    var page_height = (api.winHeight-Number($api.getStorage('StatusBarHeight')))
+                    var page_height = (api.winHeight-Number($A.getStorage('StatusBarHeight')))
                     $('.my_spread_list_page').height(page_height)
                 },600)
             },600)

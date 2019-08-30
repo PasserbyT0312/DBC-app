@@ -76,8 +76,8 @@
 .coin_info_list>.rows>.icon_box>img{ display: inline-block; margin-top: 18px; width: 30px; height: 30px;}
 .coin_info_list>.rows>.info_box{ flex: 280; background: #FFFFFF; line-height: 25px; padding-top: 10px;}
 .coin_info_list>.rows>.info_box>.item{ width: 100%; display: flex;}
-.coin_info_list>.rows>.info_box>.item>.left_item{ flex: 2; text-indent: 10px;}
-.coin_info_list>.rows>.info_box>.item>.right_item{flex: 2; text-align: right; padding-right: 10px;}
+.coin_info_list>.rows>.info_box>.item>.left_item{ text-indent: 10px;}
+.coin_info_list>.rows>.info_box>.item>.right_item{flex: 1; text-align: right; padding-right: 10px;}
 .coin_info_list>.rows>.info_box>.item>.left_item>.name{ font-size: 1.25rem; color: #152D4C; font-weight: bold;}
 .coin_info_list>.rows>.info_box>.item>.left_item>.alias{ font-size: 11px; color: #888888;}
 .coin_info_list>.rows>.info_box>.item>.right_item>.price{ font-size: 16px; color:#152D4C;font-weight: bold; }
@@ -340,8 +340,8 @@
 .capital_page>.coin_list{ overflow: auto; padding-bottom: 60px; }
 .capital_page>.coin_list>.item{ margin-top: 10px;background: #ffffff;font-size: 1.2rem;}
 .capital_page>.coin_list>.item>.top_info{width: 95%; margin: 0px auto; height: 45px; line-height: 45px; border-bottom: 1px solid #f1f1f1;}
-.capital_page>.coin_list>.item>.top_info>img.icon{ width: 25px; height: 25px; display: inline-block; margin: 5px; margin-top: 12px;}
-.capital_page>.coin_list>.item>.top_info>span{ display: inline-block; position: relative; top: -12px;}
+.capital_page>.coin_list>.item>.top_info img.icon{ width: 25px; height: 25px; display: inline-block; margin: 5px;}
+.capital_page>.coin_list>.item>.top_info span{ display: inline-block; position: relative;}
 .capital_page>.coin_list>.item>.money_info{ width: 95%; margin: 0px auto;}
 .capital_page>.coin_list>.item>.money_info>.money_item{ width:33.33333%; float: left; height: 28px; line-height: 28px;color: #555555; }
 .capital_page>.coin_list>.item>.money_info>.money_item span.use_able{ color: #00aafd}
@@ -616,7 +616,9 @@
 .trade_chart_page>.overview>.left>.curr{ height: 50px; line-height: 50px; font-size: 16px; text-align: center; color: #FFFFFF;}
 .trade_chart_page>.overview>.left>.pre{ height: 25px; line-height: 25px;}
 .trade_chart_page>.overview>.left>.pre>.trend_nums{ display: inline-block; width: 52%; text-align: center;}
-.trade_chart_page>.overview>.left>.pre>.trend_percent{display: inline-block; width: 45%; color: #da2831; text-align: center;}
+.trade_chart_page>.overview>.left>.pre>.trend_percent{display: inline-block; width: 45%; text-align: center;}
+.trade_chart_page>.overview>.left>.pre>.trend_percent.up{color: #da2831;}
+.trade_chart_page>.overview>.left>.pre>.trend_percent.down{color: #01A346;}
 .trade_chart_page>.overview>.right{ flex: 6;}
 .trade_chart_page>.overview>.right>.item{ width: 50%; height: 25px; line-height: 25px; float: left;}
 .trade_chart_page>.act_row{ height: 45px; line-height: 45px; display: flex; background: #1C1E26; color: #EEEEEE;}

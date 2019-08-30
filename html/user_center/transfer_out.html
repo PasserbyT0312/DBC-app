@@ -16,7 +16,7 @@
 
     <!--头部标题-->
     <div class="com_head">
-        <div class="back_but" onclick="$A.change_frame($api.getStorage('from_page'))"></div>
+        <div class="back_but" onclick="$A.change_frame($A.getStorage('from_page'))"></div>
         <div class="title"  v-text="coin_name+'转出'"></div>
         <div class="right_box" onclick="$A.change_frame('user_center_transfer_out_record')">
             轉出記錄
@@ -62,7 +62,7 @@
 
         <div class="row">
             <div class="name">
-                交易密碼: 
+                交易密碼:
             </div>
             <div class="content">
                 <input type="password" v-model="form_password" class="input">
@@ -119,7 +119,6 @@
             var $this=this
             setTimeout(function () {
                 $this.get_data()
-
                 // 监听属性
                 api.addEventListener({
                     name: 'user_center_transfer_out_reflush'
@@ -132,7 +131,7 @@
 
             get_data: function () {
                 var $this = this
-                $this.curr_coin = $api.getStorage('choose_currency_coin')
+                $this.curr_coin = $A.getStorage('choose_currency_coin')?JSON.parse($A.getStorage('choose_currency_coin')):'';
                 //$A.alert('当期币种信息: '+JSON.stringify($this.curr_coin))
                 $A.request('finance/in_info', {
                     coin: $this.curr_coin.name
@@ -165,14 +164,17 @@
                     $A.toast('【交易密碼】-錯誤')
                     return
                 }
+                var tokens = $A.getStorage('token');
                 var params={
+                    token: tokens,
                     addr:this.form_address,
-                    coin:this.curr_coin.name.toLowerCase(),
+                    coin_name:this.curr_coin.name.toLowerCase(),
                     num:this.form_nums,
-                    pay_pwd:this.form_password
+                    pay_password:this.form_password
                 }
-                $A.alert(JSON.stringify(params))
-                $A.request('finance/coin_out',params,function (data) {
+                // console.log(JSON.stringify(params))
+                $A.request('Finance/out_submit',params,function (data) {
+                  // console.log(JSON.stringify(params))
                     $A.alert('操作成功!')
                     $A.change_frame('user_center_index')
                 })

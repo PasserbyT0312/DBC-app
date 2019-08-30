@@ -16,14 +16,14 @@
 <div id="app" class="trade_page">
     <!--头部区域-->
     <div class="head_bar">
-        <div class="left_box" onclick="$A.choose_trade_pairs('trade')">
+        <div class="left_box" onclick="$A.choose_trade_pairs('trade','trade_index')">
             <img :src="curr_coin.img" class="coin_icon" onerror="this.src=image_load_error"/>
             <div class="coin_name" v-text="curr_coin.name && curr_coin.name.replace('_','/')"></div>
             <div class="arrow_down_icon"></div>
         </div>
         <div class="right_box">
             <!--<span class="record_tag selected"></span>-->
-            <span class="chart_tag" onclick="$A.change_frame('trade_chart')"></span>
+            <span class="chart_tag" @click="tradeChart"></span>
         </div>
     </div>
 
@@ -249,15 +249,11 @@
         },
         mounted: function () {
             var $this = this
+
             setTimeout(function () {
-                var token = api.getPrefs({
-                    sync: true,
-                    key: 'token'
-                });
+                var token = $A.getStorage('token');
                 $this.token = token ? token : ''
-
-
-                var default_coin = $api.getStorage('choose_trade_pairs_data')
+                var default_coin = $A.getStorage('choose_trade_pairs_data')?JSON.parse($A.getStorage('choose_trade_pairs_data')):'';
                 if (default_coin) {
                     $this.curr_coin = default_coin
                 } else {
@@ -265,10 +261,10 @@
                 }
 
                 //$this.trade_pairs_data()
-                //$api.setStorage('choose_trade_pairs_data', null)
                 api.addEventListener({
                     name: 'trade_index_change_coin'
                 }, function (ret, err) {
+
                     $this.curr_coin = ret.value
                     $this.trade_pairs_data()
                     $this.$forceUpdate()
@@ -278,10 +274,7 @@
                 api.addEventListener({
                     name: 'trade_index_reflush'
                 }, function (ret, err) {
-                    var token = api.getPrefs({
-                        sync: true,
-                        key: 'token'
-                    });
+                    var token = $A.getStorage('token');
                     $this.token = token ? token : ''
                     $this.trade_pairs_data()
                     $this.$forceUpdate()
@@ -298,7 +291,7 @@
 
                 setTimeout(function () {
                     // 底部导航高度
-                    var top = api.winHeight - $('#footer').height() - Number($api.getStorage('SafeAreaBottom'))
+                    var top = api.winHeight - $('#footer').height() - Number($A.getStorage('SafeAreaBottom'))
                     $('#footer').css({
                         top: top + 'px'
                     })
@@ -425,6 +418,13 @@
                     $this.trade_pairs_data()
                 })
 
+            },
+            //获取k线数据
+            tradeChart:function(){
+              api.sendEvent({
+                  name: 'trade_chart_reflush'
+              });
+              $A.change_frame('trade_chart')
             }
         }
     })

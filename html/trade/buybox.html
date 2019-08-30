@@ -212,10 +212,7 @@
                 },
                 goDetail: function() {
                   var $this = this;
-                  var tokens = api.getPrefs({
-                      sync: true,
-                      key: 'token'
-                  });
+                  var tokens = $A.getStorage('token');
                   var params = {
                       token: tokens,
                       order_no:this.orderList.order_no,

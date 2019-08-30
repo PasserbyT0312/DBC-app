@@ -112,7 +112,7 @@
                     $this.idcardimg2 = data.idcardimg2
                     $this.idcardimg3 = data.idcardimg3
                     $this.idcardinfo = data.idcardinfo
-                    $api.setStorage('idcardauth', data.status)
+                    $A.setStorage('idcardauth', data.status)
 
                 })
             },
@@ -127,14 +127,14 @@
                             status: 0
                         }
                     });
-                    $api.setStorage('idcardauth', 0)
+                    $A.setStorage('idcardauth', 0)
                     $A.change_frame('user_setup_auth_submit')
                 })
             },
 
             // 返回
             back:function () {
-                $A.change_frame($api.getStorage('from_page'))
+                $A.change_frame($A.getStorage('from_page'))
             }
         }
     })

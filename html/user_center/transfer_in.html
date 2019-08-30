@@ -17,7 +17,7 @@
 
     <!--头部标题-->
     <div class="com_head">
-        <div class="back_but" onclick="$A.change_frame($api.getStorage('from_page'))"></div>
+        <div class="back_but" onclick="$A.change_frame($A.getStorage('from_page'))"></div>
         <div class="title" v-text="coin_name+'转入'"></div>
         <div class="right_box" onclick="$A.change_frame('user_center_transfer_in_record')">
             轉入記錄
@@ -106,7 +106,7 @@
             //获取数据
             get_data: function () {
                 var $this = this
-                $this.curr_coin = $api.getStorage('choose_currency_coin')
+                $this.curr_coin = $A.getStorage('choose_currency_coin')?JSON.parse($A.getStorage('choose_currency_coin')):'';
                 //$A.alert('当期币种信息: '+JSON.stringify($this.curr_coin))
                 //$A.alert('参数：'+$this.curr_coin.name)
                 $A.request('finance/in_info', {

@@ -168,24 +168,19 @@
         </header>
         <div class="top">
             <div v-if="detail.status==0" class="flex-center">
-              <img src="../../css/img/wait.png" alt="" class="statusIcon">
-              待支付
+                <img src="../../css/img/wait.png" alt="" class="statusIcon"> 待支付
             </div>
-            <div  v-else-if="detail.status==1" class="flex-center">
-              <img src="../../css/img/wait.png" alt="" class="statusIcon">
-              待確認
+            <div v-else-if="detail.status==1" class="flex-center">
+                <img src="../../css/img/wait.png" alt="" class="statusIcon"> 待確認
             </div>
-            <div  v-else-if="detail.status==2" class="flex-center">
-              <img src="../../css/img/success.png" alt="" class="statusIcon">
-              已完成
+            <div v-else-if="detail.status==2" class="flex-center">
+                <img src="../../css/img/success.png" alt="" class="statusIcon"> 已完成
             </div>
-            <div  v-else-if="detail.status==3" class="flex-center">
-              <img src="../../css/img/sale.png" alt="" class="statusIcon">
-              掛賣中
+            <div v-else-if="detail.status==3" class="flex-center">
+                <img src="../../css/img/sale.png" alt="" class="statusIcon"> 掛賣中
             </div>
-            <div  v-else class="flex-center">
-              <img src="../../css/img/cancel.png" alt="" class="statusIcon">
-              已取消
+            <div v-else class="flex-center">
+                <img src="../../css/img/cancel.png" alt="" class="statusIcon"> 已取消
             </div>
         </div>
         <div class="orderNum">
@@ -198,7 +193,7 @@
                 <ul v-if="detail.pay_alipay" class="aui-list aui-list-in">
                     <li class="aui-list-item aui-list-item-middle">
                         <div class="aui-list-item-inner aui-list-item-arrow">
-                            <div  class="aui-list-item-title">支付寶</div>
+                            <div class="aui-list-item-title">支付寶</div>
                         </div>
                     </li>
                     <li class="aui-list-item">
@@ -208,9 +203,9 @@
                         </div>
                     </li>
                     <li class="aui-list-item">
-                        <div  class="aui-list-item-inner">
-                            <div  class="aui-list-item-title">支付寶賬號</div>
-                            <div class="aui-list-item-right">{{detail.pay_alipay.account}} <img src="../../css/img/copy.png" alt="" class="copyBtn"  @click="$A.copy(detail.pay_alipay.account)"></div>
+                        <div class="aui-list-item-inner">
+                            <div class="aui-list-item-title">支付寶賬號</div>
+                            <div class="aui-list-item-right">{{detail.pay_alipay.account}} <img src="../../css/img/copy.png" alt="" class="copyBtn" @click="$A.copy(detail.pay_alipay.account)"></div>
                         </div>
                     </li>
                 </ul>
@@ -228,8 +223,8 @@
                     </li>
                     <li class="aui-list-item">
                         <div class="aui-list-item-inner">
-                            <div  class="aui-list-item-title">銀行卡賬號</div>
-                            <div class="aui-list-item-right">{{detail.pay_bank.card}}  <img src="../../css/img/copy.png" alt="" class="copyBtn"  @click="$A.copy(detail.pay_bank.card)"></div>
+                            <div class="aui-list-item-title">銀行卡賬號</div>
+                            <div class="aui-list-item-right">{{detail.pay_bank.card}} <img src="../../css/img/copy.png" alt="" class="copyBtn" @click="$A.copy(detail.pay_bank.card)"></div>
                         </div>
                     </li>
                 </ul>
@@ -242,6 +237,12 @@
                         <div class="aui-list-item-inner">
                             <div class="aui-list-item-title">{{detail.act_type==0?'賣':'買'}}家實名</div>
                             <div class="aui-list-item-right">{{detail.act_type==0?detail.sale_name:detail.buy_name}} <img src="../../css/img/copy.png" alt="" class="copyBtn" @click="$A.copy(detail.act_type==0?detail.sale_name:detail.buy_name)"></div>
+                        </div>
+                    </li>
+                    <li v-if="detail.status!=-1" class="aui-list-item">
+                        <div class="aui-list-item-inner">
+                            <div class="aui-list-item-title">{{detail.act_type==0?'賣':'買'}}家聯系方式</div>
+                            <div class="aui-list-item-right">{{detail.moble}} <img src="../../css/img/copy.png" alt="" class="copyBtn" @click="$A.copy(detail.moble)"></div>
                         </div>
                     </li>
                     <li class="aui-list-item">
@@ -270,7 +271,11 @@
             <div class="cancel" @click="cancelBuyOrder">取消訂單</div>
             <div class="paySuccess" @click="paymentPay">我已付款成功</div>
         </div>
-        <!-- 待确认 -->
+        <!-- 待确认买家 -->
+        <div v-show="detail.status==1&&detail.act_type==0" class="btn_row flex-box-between">
+            <div class="paySuccess" @click="undoOrder()" style="width:100%;">撤銷訂單</div>
+        </div>
+        <!-- 待确认卖家 -->
         <div v-show="detail.status==1&&detail.act_type==1" class="btn_row flex-box-between">
             <div class="paySuccess" @click="collectionPay" style="width:100%;">我已收款成功</div>
         </div>
@@ -295,29 +300,26 @@
                 status: 0,
                 isShow: false,
                 detail: {},
-                order_no:api.pageParam.orderId,
-                tradePwd:''
+                order_no: api.pageParam.orderId,
+                tradePwd: ''
             },
             mounted: function() {
                 this.getDetail();
             },
             methods: {
-                getDetail:function () {
-                  var $this = this;
-                  var tokens = api.getPrefs({
-                      sync: true,
-                      key: 'token'
-                  });
-                  var params = {
-                      token: tokens,
-                      order_no:this.order_no
-                  };
-                  // console.log(this.order_no);
-                  $A.request('otc/details', params, function(data) {
+                getDetail: function() {
+                    var $this = this;
+                    var tokens = $A.getStorage('token');
+                    var params = {
+                        token: tokens,
+                        order_no: this.order_no
+                    };
+                    // console.log(this.order_no);
+                    $A.request('otc/details', params, function(data) {
                         // console.log(JSON.stringify(data));
                         // console.log(JSON.stringify(data));
                         $this.detail = data;
-                  })
+                    })
                 },
                 cancelBuyOrder: function() {
                     var $this = this;
@@ -333,11 +335,8 @@
                     })
                 },
                 cancelOrder: function() {
-                      var $this = this;
-                    var tokens = api.getPrefs({
-                        sync: true,
-                        key: 'token'
-                    });
+                    var $this = this;
+                    var tokens = $A.getStorage('token');
                     var params = {
                         token: tokens,
                         order_no: this.order_no,
@@ -409,57 +408,51 @@
                     }, function(ret) {
                         if (ret.eventType == 'right') {
                             $this.tradePwd = ret.text;
-                            if($this.tradePwd == ''){
-                              $A.alert('請輸入交易密碼')
-                            }else{
-                              var tokens = api.getPrefs({
-                                  sync: true,
-                                  key: 'token'
-                              });
-                              var params = {
-                                  token: tokens,
-                                  order_no:$this.order_no,
-                                  pay_password:$this.tradePwd,
-                              };
-                              dialogBox.close({
-                                  dialogName: 'input'
-                              });
-                              $A.request('otc/confirm', params, function(data) {
+                            if ($this.tradePwd == '') {
+                                $A.alert('請輸入交易密碼')
+                            } else {
+                                var tokens = $A.getStorage('token');
+                                var params = {
+                                    token: tokens,
+                                    order_no: $this.order_no,
+                                    pay_password: $this.tradePwd,
+                                };
+                                dialogBox.close({
+                                    dialogName: 'input'
+                                });
+                                $A.request('otc/confirm', params, function(data) {
                                     // console.log(data);
                                     // console.log(JSON.stringify(data));
                                     $this.getDetail();
                                     api.sendEvent({
                                         name: 'changeOtcOrder',
                                     });
-                              })
+                                })
                             }
-                        }else{
-                          dialogBox.close({
-                              dialogName: 'input'
-                          });
+                        } else {
+                            dialogBox.close({
+                                dialogName: 'input'
+                            });
                         }
                     });
 
                 },
                 //确认付款
-                paymentPay:function () {
-                  var $this = this;
-                  var tokens = api.getPrefs({
-                      sync: true,
-                      key: 'token'
-                  });
-                  var params = {
-                      token: tokens,
-                      order_no:this.order_no
-                  };
-                  $A.request('otc/confirm_pay', params, function(data) {
+                paymentPay: function() {
+                    var $this = this;
+                    var tokens = $A.getStorage('token');
+                    var params = {
+                        token: tokens,
+                        order_no: this.order_no
+                    };
+                    $A.request('otc/confirm_pay', params, function(data) {
                         // console.log(data);
                         // console.log(JSON.stringify(data));
                         $this.getDetail();
                         api.sendEvent({
                             name: 'changeOtcOrder',
                         });
-                  })
+                    })
                 },
                 showCode: function() {
                     $('html,body').addClass('overhide'); //使网页不可滚动
@@ -481,7 +474,30 @@
                             alert('请允许DBC访问您的相册权限');
                         }
                     });
-                }
+                },
+                //买家撤销
+                undoOrder: function() {
+                    var $this = this;
+                    api.confirm({
+                        title: '撤銷訂單',
+                        msg: '您確認要進行該操作麽？',
+                        buttons: ['確定', '取消']
+                    }, function(ret, err) {
+                        if (ret.buttonIndex === 2) {
+                            return;
+                        }
+                        var tokens = $A.getStorage('token');
+                        var params = {
+                            token: tokens,
+                            order_no: $this.order_no,
+                        };
+                        $A.request('otc/cancel', params, function(data) {
+                            // console.log(data);
+                            // console.log(JSON.stringify(data));
+                            $this.getDetail();
+                        })
+                    })
+                },
             }
         })
     }

@@ -274,7 +274,7 @@
                 <span :class="{'active':cur==0}" @click="change_type(0)">我要買</span>
                 <span :class="{'active':cur==1}" @click="change_type(1)">我要賣</span>
             </div>
-            <span class="aui-pull-right aui-iconfont aui-icon-cert" @click="orderList()" style="font-size:22px;"></span>
+            <span class="aui-pull-right" @click="orderList()" style="height:50px;line-height:50px;"><span class="aui-iconfont aui-icon-cert" style="font-size:22px;"></span></span>
         </header>
 
         <div v-show="cur==0">
@@ -373,8 +373,6 @@
             <div class="tx-c  margin-b-10  margin-t-15">
                 <button class="aui-btn clickOrder" type="button" @click="sellCoin">賣出</button>
             </div>
-
-            <div class="tx-c myadv blue" @click="myAdv()">我的廣告</div>
         </div>
 
     </div>
@@ -428,10 +426,7 @@
                 //列表
                 getList:function () {
                   var $this = this;
-                  var tokens = api.getPrefs({
-                      sync: true,
-                      key: 'token'
-                  });
+                  var tokens = $A.getStorage('token');
                   var params = {
                       token: tokens,
                       coin_name: $this.coinType,
@@ -469,10 +464,7 @@
                         $this.userBalance = Object.values(data.coin_list)[0].balance;
                         // $this.$forceUpdate()
                     }
-                    var tokens = api.getPrefs({
-                        sync: true,
-                        key: 'token'
-                    });
+                    var tokens = $A.getStorage('token');
                     var params = {
                         token: tokens
                     };
@@ -529,10 +521,7 @@
                 },
                 sellCoin:function () {
                   var $this = this;
-                  var tokens = api.getPrefs({
-                      sync: true,
-                      key: 'token'
-                  });
+                  var tokens = $A.getStorage('token');
                   if($this.price==''){
                     $A.toast('請填寫交易單價');
                     return false;
@@ -573,22 +562,16 @@
                     })
                   }
                 },
-                myAdv:function () {
-                  api.openFrame({
-                      name: 'myAdv',
-                      url: '../trade/myAdv.html'
-                  });
-                }
             }
         })
         // 设置滚到div标签
     function set_scroll_div() {
         var ID = 'otcList'
             // 设置列表高度
-        var curr_height = $('.coin_type').height() + $('.com_head').height() + Number($api.getStorage('StatusBarHeight')) - 20
+        var curr_height = $('.coin_type').height() + $('.com_head').height() + Number($A.getStorage('StatusBarHeight')) - 20
             // console.log($('.top').height());
             //   console.log($('.com_head').height());
-            //     console.log(Number($api.getStorage('StatusBarHeight')));
+            //     console.log(Number($A.getStorage('StatusBarHeight')));
         $('#' + ID).height(api.winHeight - curr_height)
         document.getElementById(ID).onscroll = function() {
             var scrollHeight = document.getElementById(ID).scrollHeight;

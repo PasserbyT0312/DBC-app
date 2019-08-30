@@ -83,8 +83,10 @@
         methods: {
             sure: function () {
                 var $this=this
-                $api.setStorage('choose_trade_pairs_data',$this.curr_data)
-                var type = $api.getStorage('choose_trade_pairs_type')
+                // console.log(typeof $this.curr_data)
+                $A.setStorage('choose_trade_pairs_data',JSON.stringify($this.curr_data))
+                var type = $A.getStorage('choose_trade_pairs_type')
+                // console.log(type);
                 switch (type) {
                     // 交易
                     case 'trade':
@@ -101,7 +103,7 @@
                 }
             },
             back:function () {
-                $A.change_frame($api.getStorage('choose_trade_pairs_type_from'))
+                $A.change_frame($A.getStorage('choose_trade_pairs_type_from'))
             }
         }
     })

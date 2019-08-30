@@ -69,11 +69,11 @@
         },
         methods: {
             get_detail: function () {
-                var id = Number($api.getStorage('notice_detail_id'))
+                var id = Number($A.getStorage('notice_detail_id'))
                 // console.log(id);
                 // $A.alert(id)
                 var $this = this
-                // $api.setStorage('notice_detail_id', null)
+                // $A.setStorage('notice_detail_id', null)
                 if (id > 0) {
                     $A.request('news/show', {id: id}, function (data) {
                         /*$A.alert('标题'+data.title)

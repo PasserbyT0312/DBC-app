@@ -1,6 +1,6 @@
 apiready = function () {
-    $api.setStorage('FrameGroupName', '')
-    $api.setStorage('FrameGroupIndex', '')
+    $A.setStorage('FrameGroupName', '')
+    $A.setStorage('FrameGroupIndex', '')
 
     // 初始化frame组
     $A.initGroup()
@@ -12,14 +12,9 @@ apiready = function () {
         name: 'user_login_success'
     }, function(ret, err) {
         //$A.alert('接收到的token是:'+ret.value.token)
-        api.setPrefs({
-            key: 'token',
-            value: ret.value.token
-        });
-        api.setPrefs({
-            key: 'username',
-            value: ret.value.username
-        });
+        $A.setStorage('token',ret.value.token);
+        $A.setStorage('username',ret.value.username);
+        $api.setStorage('token',ret.value.token);
     });
 
     if ($A.isAndroid()) {
@@ -27,7 +22,7 @@ apiready = function () {
         api.addEventListener({
             name: 'keyback'
         }, function (ret, err) {
-            var p = $api.getStorage('curr_page')
+            var p = $A.getStorage('curr_page')
             var list = $api.getStorage('page_history')
             if (p === '' || p === 'index' || p === 'trade_index'|| p === 'user_center_capital' || p === 'user_center_index' || typeof list === 'undefined') {
                 api.closeWin();
@@ -45,6 +40,3 @@ apiready = function () {
     }
 
 }
-
-
-

@@ -162,7 +162,7 @@
                             status: 3
                         }
                     });
-                    $api.setStorage('idcardauth', 3)
+                    $A.setStorage('idcardauth', 3)
                     $A.alert('信息已經上傳,請等待系統處理通過')
                     $A.change_frame('user_center_index')
                 })
@@ -229,11 +229,9 @@
                     //$A.toast('上传成功')
                     //$A.alert('上传完毕:' + $A.domname + $this['idcardimg' + type]);
                 }
+                var tokens = $A.getStorage('token');
                 $A.request('user/card_upload', {
-                    token: api.getPrefs({
-                        sync: true,
-                        key: 'token'
-                    })
+                    token: tokens
                 }, fun, null, fileParams)
             }
 

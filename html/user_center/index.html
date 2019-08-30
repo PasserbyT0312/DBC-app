@@ -297,12 +297,10 @@
                     //$A.toast('头像地址是:'+data)
                 }
                 var fileParams = {}
-                fileParams['head_img'] = imgPath
+                fileParams['head_img'] = imgPath;
+                var tokens = $A.getStorage('token');
                 var params={
-                    token: api.getPrefs({
-                        sync: true,
-                        key: 'token'
-                    })
+                    token: tokens
                 }
                 $A.request('user/head_save',params , fun, null, fileParams)
             },
@@ -316,7 +314,7 @@
                     $this.idcardauth = data.idcardauth - 0
                     $this.balance = data.balance
                     // 保存用户认证状态
-                    $api.setStorage('idcardauth', data.idcardauth)
+                    $A.setStorage('idcardauth', data.idcardauth)
                     $this.$forceUpdate()
                 }
                 $A.request('user/base_info', {}, fun, fun, null, true)

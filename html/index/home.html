@@ -52,9 +52,9 @@
     <div class="market_top">
         <div class="item" v-for="(val,key) in top_market">
             <div class="name" v-text="val.market"></div>
-            <div class="price" v-text="val.price" :class="{oragen:key===1}"></div>
-            <div class="rate" v-text="val.rate" :class="{oragen:key===1}"></div>
-            <div class="rate" v-text="val.rmb" :class="{oragen:key===1}"></div>
+            <div class="price" v-text="val.price" :class="{oragen:parseFloat(val.rate)<0}"></div>
+            <div class="rate" v-text="val.rate" :class="{oragen:parseFloat(val.rate)<0}"></div>
+            <div class="rate" v-text="'≈'+val.cny+' CNY'" :class="{oragen:parseFloat(val.rate)<0}"></div>
         </div>
     </div>
     <div class="coin_type_list">
@@ -239,26 +239,7 @@
                     "name": "圖片2"
                 }
             ],
-            top_market: [
-                {
-                    "market": "BTC/USDT",
-                    "price": "9765.78",
-                    "rate": "0.87%",
-                    "rmb":"≈67505.51 CNY"
-                },
-                {
-                    "market": "ETH/USDT",
-                    "price": "213.08",
-                    "rate": "0.42%",
-                    "rmb":"≈1472.38 CNY"
-                },
-                {
-                    "market": "DBC/USDT",
-                    "price": "1.09",
-                    "rate": "0.05%",
-                    "rmb":"≈6.9097 CNY"
-                }
-            ],
+            top_market: [],
             news_info: {
                 "id": "166",
                 "title": "最新公告"
@@ -395,7 +376,9 @@
                 var $this = this
                 var set_data = function (data) {
                     //$A.alert(JSON.stringify(data.banner_list))
-                    $this.market_list = data.market_list
+                    // console.log(JSON.stringify(data));
+                    $this.market_list = data.market_list;
+                    $this.top_market = data.top_market;
                     var trade_pairs = []
                     $.each($this.market_list, function (i, obj) {
                         trade_pairs.push({
@@ -424,7 +407,8 @@
                     img: val.img,
                     market_name: val.market_name,
                 }
-                $api.setStorage('choose_trade_pairs_data', params)
+
+                $A.setStorage('choose_trade_pairs_data', JSON.stringify(params))
                 api.sendEvent({
                     name: 'trade_index_change_coin',
                     extra: params
@@ -437,15 +421,12 @@
                 // $A.check_login(function () {
                 //     $A.change_frame('user_center_my_spread', 'index')
                 // })
-                $api.setStorage('notice_detail_id', '166');
+                $A.setStorage('notice_detail_id', '166');
                 $A.change_frame('user_center_notice_detail');
             },
             jumpElse:function () {
               $A.check_login(function () {
-                var tokens = api.getPrefs({
-                    sync: true,
-                    key: 'token'
-                });
+                var tokens = $A.getStorage('token');
                 var params = {
                     token: tokens
                 }

@@ -130,15 +130,8 @@
                     verify.val('')
                 }
                 // 登录成功
-                //$A.set_token('token',data)
-                api.setPrefs({
-                    key: 'token',
-                    value: data
-                });
-                api.setPrefs({
-                    key: 'username',
-                    value: username.val()
-                });
+                $A.setStorage('token',data)
+                $A.setStorage('username',username.val())
                 api.sendEvent({
                     name: 'user_center_index_reflush',
                 });

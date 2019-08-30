@@ -25,7 +25,7 @@ $A.request = function (url, params, success_call_back, pre_do_call_back, file, i
     var cache_key = 'request_data#' + url
 
     // 获取上次请求数据
-    var pre_data_str = $api.getStorage(cache_key);
+    var pre_data_str = $A.getStorage(cache_key);
     if (is_set(pre_data_str)) {
         var pre_data = $.parseJSON(pre_data_str)
         if (typeof pre_data !== 'undefined' && typeof pre_do_call_back === 'function') {
@@ -50,10 +50,7 @@ $A.request = function (url, params, success_call_back, pre_do_call_back, file, i
 
     var group = url.split('/')[0]
     if (group === 'finance' || group === 'user' || url === 'trade/submit' || url === 'trade/get_list' || url === 'trade/repeal'|| url === 'otc') {
-        var token = api.getPrefs({
-            sync: true,
-            key: 'token'
-        });
+        var token =  $A.getStorage('token');
         if (!is_set(token)) {
             $A.confirm(function () {
                 $A.change_frame('login')
@@ -61,7 +58,7 @@ $A.request = function (url, params, success_call_back, pre_do_call_back, file, i
             return
         }
         // console.log(token);
-        params.token = token
+        params.token = token;
     }
 
     //调用加载框
@@ -81,7 +78,7 @@ $A.request = function (url, params, success_call_back, pre_do_call_back, file, i
     //如果是文件上传调用文件长传接口/拼接普通业务接口
     url = $A.url + url;
 
-    //$A.copy($api.getStorage('token'))
+    //$A.copy($A.getStorage('token'))
     // $A.alert('url: '+url)
     //$A.alert('参数是:'+JSON.stringify(params))
     api.ajax({
@@ -116,7 +113,7 @@ $A.request = function (url, params, success_call_back, pre_do_call_back, file, i
         ret.code = Number(ret.code)
         //服务器返回数据校验
         if (ret.code === 0) {
-            $api.setStorage(cache_key, JSON.stringify(ret.data));
+            $A.setStorage(cache_key, JSON.stringify(ret.data));
             // 正确返回
             if (typeof (success_call_back) === 'function') {
                 success_call_back(ret.data)
@@ -320,10 +317,7 @@ function is_set(obj) {
  *检查用户是否登录
  */
 $A.check_login = function (call_back) {
-    var user = api.getPrefs({
-        sync: true,
-        key: 'token'
-    });
+    var user = $A.getStorage('token');
     if (!is_set(user)) {
         if (call_back) {
             $A.login_out(true);
@@ -352,12 +346,8 @@ $A.login_out = function (no_tip) {
 
     function out() {
         //  清空当前用户的session
-        api.removePrefs({
-            key: 'token'
-        });
-        api.removePrefs({
-            key: 'username'
-        });
+        $A.removeStorage('token');
+        $A.removeStorage('username');
         $A.change_frame('login')
     }
 }
@@ -396,7 +386,7 @@ function init_send_sms(type, button, mobi) {
             params.type = type;
             $A.request('send_sms', params, function (data) {
                 $A.toast('發送成功!');
-                $api.setStorage(second_key, seconds)
+                $A.setStorage(second_key, seconds)
                 check_second();
             });
         })
@@ -404,7 +394,7 @@ function init_send_sms(type, button, mobi) {
 
         //检查验证码等待时间
         function check_second() {
-            $A[second_key] = $api.getStorage(second_key) - 0;
+            $A[second_key] = $A.getStorage(second_key) - 0;
             if ($A[second_key] > 0) {
                 //需要等待
                 function second_reduce() {
@@ -418,7 +408,7 @@ function init_send_sms(type, button, mobi) {
                             .attr('disabled', false)
                             .html('發送驗證碼');
                     }
-                    $api.setStorage(second_key, $A[second_key]);
+                    $A.setStorage(second_key, $A[second_key]);
                 }
 
                 $A.timer = setInterval(function () {
@@ -435,7 +425,27 @@ function init_send_sms(type, button, mobi) {
 
     }
 }
-
+//加入缓存
+$A.setStorage = function (name, value) {
+    api.setPrefs({
+        key: name,
+        value: value
+    });
+}
+//取缓存
+$A.getStorage = function (name) {
+    var str = api.getPrefs({
+        sync: true,
+        key: name
+    });
+    return str;
+}
+//删除缓存
+$A.removeStorage = function (name){
+  api.removePrefs({
+      key: name
+  });
+}
 
 /**
  * 检查当前应用版本
@@ -753,7 +763,7 @@ $A.jpush = function () {
                     return;
                 }
                 if (extra.act == 'order' && extra.id) {
-                    $api.setStorage('order_id', extra.id);
+                    $A.setStorage('order_id', extra.id);
                     if (api.winName == 'user') {
                         if (api.frameName == 'order_detail') {
                             //如果当前正处于订单详情的话
@@ -770,7 +780,7 @@ $A.jpush = function () {
                             });
                         }
                     } else {
-                        $api.setStorage('back_page', api.winName);
+                        $A.setStorage('back_page', api.winName);
                         api.execScript({
                             name: 'root',
                             script: 'open_user(11);'
@@ -796,7 +806,7 @@ $A.jpush = function () {
         //获取reguitID
         ajpush.getRegistrationId(function (ret) {
             //$A.toast('jpush注册ID:'+ret.id);
-            $api.setStorage('registration_id', ret.id)
+            $A.setStorage('registration_id', ret.id)
         });
 
     }
@@ -1250,8 +1260,8 @@ $A.frames = [
 // 打开frame组
 $A.initGroup = function () {
     // var statusBar = api.require('statusBar');//未使用 暂时注释
-    $api.setStorage('StatusBarHeight', api.safeArea.top)
-    $api.setStorage('SafeAreaBottom', api.safeArea.bottom)
+    $A.setStorage('StatusBarHeight', api.safeArea.top)
+    $A.setStorage('SafeAreaBottom', api.safeArea.bottom)
     //$A.alert('底部:'+api.safeArea.bottom)
 
     api.setStatusBarStyle({
@@ -1276,12 +1286,12 @@ $A.initGroup = function () {
 
 // 获取-状态栏高度
 $A.getStatusHeight = function () {
-    return Number($api.getStorage('StatusBarHeight'))
+    return Number($A.getStorage('StatusBarHeight'))
 }
 
 // 获取-底部栏高度
 $A.getSafeAreaBottomHeight = function () {
-    return Number($api.getStorage('SafeAreaBottom'))
+    return Number($A.getStorage('SafeAreaBottom'))
 }
 
 
@@ -1314,9 +1324,13 @@ $A.add_history = function (page) {
 // 获取frame的索引
 $A.change_frame = function (frame, from) {
     var index = 0
+    // console.log(typeof(api.frameName));
+    if(api.frameName=='user_center_transfer_out_record'||api.frameName=='user_center_transfer_out'||api.frameName=='user_center_transfer_in'||api.frameName=='user_center_transfer_in_record'){
+    }else{
+      $A.setStorage('from_page', api.frameName)
+    }
 
-    $api.setStorage('from_page', api.frameName)
-    $api.setStorage('curr_page', frame)
+    $A.setStorage('curr_page', frame)
 
     if (from !== false) {
         var p = api.frameName
@@ -1367,17 +1381,19 @@ $A.copy = function (text) {
 
 // 选择货币
 $A.choose_currency = function (type) {
-    $api.setStorage('choose_currency_type', type)
+    $A.setStorage('choose_currency_type', type)
     $A.change_frame('choose_currency')
 }
 
 // 选择交易对数据
 $A.choose_trade_pairs = function (type, from) {
     if (from) {
-        $api.setStorage('choose_trade_pairs_type_from', from)
+        $A.setStorage('choose_trade_pairs_type_from', api.frameName)
     }
-    $api.setStorage('choose_trade_pairs_type', type)
-    $A.change_frame('choose_trade_pairs')
+    $A.setStorage('choose_trade_pairs_type', type)
+    setTimeout(function functionName() {
+      $A.change_frame('choose_trade_pairs')
+    },600)
 }
 
 

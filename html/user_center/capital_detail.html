@@ -51,9 +51,12 @@
 
     <div class="coin_list">
         <div class="item" v-for="val in list">
-            <div class="top_info">
-                <img :src="val.img" onerror="this.src=image_load_error" class="icon">
-                <span v-text="val.title"></span>
+            <div class="top_info flex-box-between">
+                <div class="flex-center">
+                  <img :src="val.img" onerror="this.src=image_load_error" class="icon">
+                  <span v-text="val.title"></span>
+                </div>
+                <div>合計:   <span class="all" v-text="ToDouble(val.sum)">0.00</span></div>
             </div>
             <div class="money_info">
                 <div class="money_item">
@@ -65,8 +68,8 @@
                     <span class="frozen" v-text="ToDouble(val.frozen)">0.00</span>
                 </div>
                 <div class="money_item">
-                    合計:
-                    <span class="all" v-text="ToDouble(val.sum)">0.00</span>
+                    鎖倉:
+                    <span class="frozen" v-text="ToDouble(val.lock)">0.00</span>
                 </div>
                 <div class="c"></div>
             </div>
@@ -135,7 +138,7 @@
                 $this.get_data()
 
                 setTimeout(function () {
-                    $this.from_page = $api.getStorage('from_page')
+                    $this.from_page = $A.getStorage('from_page')
                     var curr_height = $('#footer').height() + $('#act_box').height() + $('.com_head').height() + $A.getStatusHeight() + $A.getSafeAreaBottomHeight() + 155
                     //$A.toast(curr_height)
                     $('.coin_list').height(api.winHeight - (curr_height))
@@ -144,7 +147,7 @@
                 api.addEventListener({
                     name: 'user_center_capital_detail_reflush'
                 }, function (ret, err) {
-                    $this.from_page = $api.getStorage('from_page')
+                    $this.from_page = $A.getStorage('from_page')
                     $this.get_data()
                     $this.$forceUpdate()
                 });
@@ -162,18 +165,18 @@
                 },null, null, true)
             },
             zhuanRu:function (val) {
-                $api.setStorage('choose_currency_coin',val)
+                $A.setStorage('choose_currency_coin',JSON.stringify(val))
                 //$A.toast(val.name)
                 $A.change_frame('user_center_transfer_in')
             },
             zhuanChu:function (val) {
-                $api.setStorage('choose_currency_coin',val)
+                $A.setStorage('choose_currency_coin',JSON.stringify(val))
                 // $A.toast(val.name)
                 // return
                 $A.change_frame('user_center_transfer_out')
             },
             zhangDan:function (val) {
-                $api.setStorage('choose_currency_coin',val)
+                $A.setStorage('choose_currency_coin',JSON.stringify(val))
                 // $A.toast(val.name)
                 // return
                 $A.change_frame('user_center_coin_order_list')

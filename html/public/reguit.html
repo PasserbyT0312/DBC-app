@@ -196,8 +196,8 @@
 
 
     setTimeout(function () {
-        $('.reguit_page').height(api.winHeight-Number($api.getStorage('StatusBarHeight')))
-        var curr_height =  Number($api.getStorage('StatusBarHeight')) + 30+$('.com_head').height()
+        $('.reguit_page').height(api.winHeight-Number($A.getStorage('StatusBarHeight')))
+        var curr_height =  Number($A.getStorage('StatusBarHeight')) + 30+$('.com_head').height()
         $('.form').height(api.winHeight - curr_height)
         $('.form').css({
             'top':$('.com_head').height()+'px'
